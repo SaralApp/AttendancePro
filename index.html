@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Pro & Salary Management System</title>
+
+<!-- PWA & Mobile Meta Tags -->
+<meta name="theme-color" content="#2b1704">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Android bridge (file downloads) + offline libraries bundled in the app -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+  :root {
+    --font: "Times New Roman", Times, serif; 
+    --sidebar-w: 270px; 
+    --text: #fef08a;
+    --text-dark: #1e0e03;
+    --sidebar-bg: #2b1704;
+    --main-bg: #0f172a;
+    --card-bg: #3e220a;
+    --card-border: #d4af37;
+    --input-bg: #fef3c7;
+    --input-text: #1a0c02;
+    --btn-text: #fffbeb;
+    --export-font-size: 12px;
+    --export-font-family: "Times New Roman", Times, serif;
+    --font-style: normal;
+    --font-weight: 700;
+
+    --wood-texture-sidebar: 
+      radial-gradient(ellipse at 50% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 80%),
+      repeating-linear-gradient(115deg, #1f0f02 0px, #361c06 14px, #1a0c02 28px, #422308 42px, #241203 56px);
+    
+    --wood-texture-card: 
+      radial-gradient(circle at 10% 20%, rgba(254, 240, 138, 0.05) 0%, transparent 40%),
+      repeating-linear-gradient(105deg, #45240a 0px, #582f0e 16px, #331a06 32px, #633610 48px, #3d1f07 64px);
+
+    --wood-texture-btn: 
+      linear-gradient(180deg, #8c4a1b 0%, #5c2f0d 45%, #3d1c05 50%, #6e3913 100%);
+
+    --brass-border-gradient: linear-gradient(135deg, #fef08a 0%, #d4af37 40%, #85581a 70%, #fef08a 100%);
+    --brass-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+  }
+
+  /* Theme Configurations */
+  [data-theme="pearl"] {
+    --text: #0f172a; --text-dark: #0f172a; --sidebar-bg: rgba(255, 255, 255, 0.85); --main-bg: #0369a1; --card-bg: rgba(255, 255, 255, 0.88); --card-border: #38bdf8; --input-bg: #ffffff; --input-text: #0f172a; --btn-text: #ffffff; --wood-texture-sidebar: rgba(255, 255, 255, 0.85); --wood-texture-card: rgba(255, 255, 255, 0.88); --wood-texture-btn: linear-gradient(180deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%); --brass-border-gradient: linear-gradient(135deg, #e0f2fe 0%, #38bdf8 50%, #0284c7 100%); --brass-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+  }
+  [data-theme="midnight"] {
+    --text: #f8fafc; --text-dark: #f8fafc; --sidebar-bg: #0f172a; --main-bg: #020617; --card-bg: #1e293b; --card-border: #64748b; --input-bg: #090d16; --input-text: #f8fafc; --btn-text: #f8fafc; --wood-texture-sidebar: repeating-linear-gradient(120deg, #0f172a 0px, #1e293b 15px, #020617 30px); --wood-texture-card: repeating-linear-gradient(110deg, #1e293b 0px, #334155 20px, #0f172a 40px); --wood-texture-btn: linear-gradient(180deg, #475569 0%, #334155 50%, #1e293b 100%); --brass-border-gradient: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #334155 100%); --brass-shadow: 0 4px 15px rgba(148, 163, 184, 0.25);
+  }
+  [data-theme="emerald"] {
+    --text: #ecfdf5; --text-dark: #022c22; --sidebar-bg: #064e3b; --main-bg: #022c22; --card-bg: #047857; --card-border: #34d399; --input-bg: #ecfdf5; --input-text: #022c22; --btn-text: #ffffff; --wood-texture-sidebar: repeating-linear-gradient(115deg, #064e3b 0px, #065f46 15px, #022c22 30px); --wood-texture-card: repeating-linear-gradient(105deg, #047857 0px, #059669 18px, #064e3b 36px); --wood-texture-btn: linear-gradient(180deg, #10b981 0%, #059669 50%, #047857 100%); --brass-border-gradient: linear-gradient(135deg, #a7f3d0 0%, #34d399 50%, #059669 100%); --brass-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+  }
+  [data-theme="ocean"] {
+    --text: #f0f9ff; --text-dark: #0c4a6e; --sidebar-bg: #0369a1; --main-bg: #0c4a6e; --card-bg: #0284c7; --card-border: #38bdf8; --input-bg: #e0f2fe; --input-text: #0c4a6e; --btn-text: #ffffff; --wood-texture-sidebar: repeating-linear-gradient(115deg, #0369a1 0px, #0284c7 15px, #0c4a6e 30px); --wood-texture-card: repeating-linear-gradient(105deg, #0284c7 0px, #38bdf8 18px, #0369a1 36px); --wood-texture-btn: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%); --brass-border-gradient: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%); --brass-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+  }
+  [data-theme="sunset"] {
+    --text: #fff7ed; --text-dark: #431407; --sidebar-bg: #7c2d12; --main-bg: #431407; --card-bg: #c2410c; --card-border: #fb923c; --input-bg: #ffedd5; --input-text: #431407; --btn-text: #ffffff; --wood-texture-sidebar: repeating-linear-gradient(115deg, #7c2d12 0px, #9a3412 15px, #431407 30px); --wood-texture-card: repeating-linear-gradient(105deg, #c2410c 0px, #ea580c 18px, #7c2d12 36px); --wood-texture-btn: linear-gradient(180deg, #f97316 0%, #ea580c 50%, #c2410c 100%); --brass-border-gradient: linear-gradient(135deg, #fed7aa 0%, #fb923c 50%, #ea580c 100%); --brass-shadow: 0 4px 15px rgba(251, 146, 60, 0.3);
+  }
+
+  body.desktop-forced { min-width: 1280px !important; overflow-x: auto !important; }
+  body.desktop-forced .sidebar { left: 0 !important; }
+  body.desktop-forced .main { margin-left: var(--sidebar-w) !important; }
+  body.desktop-forced .topbar { display: none !important; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); font-weight: var(--font-weight); font-style: var(--font-style); }
+  
+  body {
+    background-color: var(--main-bg);
+    display: flex;
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+    position: relative;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .wood-grain-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0.12;
+    z-index: 1;
+  }
+
+  .btn, .status-badge, .profile-circle, .menu a {
+    background: var(--wood-texture-btn);
+    color: var(--btn-text);
+    border: 2px solid transparent;
+    border-image: var(--brass-border-gradient) 1;
+    border-radius: 14px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: var(--font-weight);
+    position: relative;
+    z-index: 5;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+    box-shadow:
+      inset 0 2px 3px rgba(255, 255, 255, 0.35),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.8),
+      0 6px 16px rgba(0, 0, 0, 0.6),
+      var(--brass-shadow);
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+
+  .btn:hover, .status-badge:hover, .menu a:hover, .menu a.active {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+      inset 0 3px 5px rgba(255, 255, 255, 0.5),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.6),
+      0 12px 24px rgba(0, 0, 0, 0.7),
+      0 0 18px rgba(212, 175, 55, 0.6);
+    filter: brightness(1.15);
+  }
+
+  .btn:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.95);
+  }
+
+  .btn.green { background: linear-gradient(180deg, #2d6a4f 0%, #1b4332 45%, #081c15 50%, #2d6a4f 100%); }
+  .btn.blue { background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 45%, #1e3a8a 50%, #2563eb 100%); }
+  .btn.red { background: linear-gradient(180deg, #b91c1c 0%, #991b1b 45%, #450a0a 50%, #dc2626 100%); }
+  .btn.yellow { background: linear-gradient(180deg, #b45309 0%, #78350f 45%, #451a03 50%, #d97706 100%); }
+  .btn.small { padding: 6px 14px; font-size: 12px; border-radius: 10px; }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    background-image: var(--wood-texture-sidebar);
+    color: var(--text);
+    position: fixed;
+    height: 100vh;
+    left: 0; top: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    border-right: 4px solid #d4af37;
+    box-shadow:
+      12px 0 35px rgba(0,0,0,0.85),
+      inset -3px 0 10px rgba(0,0,0,0.8),
+      inset 2px 0 5px rgba(255,255,255,0.15);
+    transition: left 0.3s ease;
+  }
+
+  .sidebar .logo {
+    padding: 24px 18px;
+    font-size: 21px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%);
+    border-bottom: 3px solid #d4af37;
+    letter-spacing: 1.8px;
+    color: var(--text);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.95);
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.7);
+  }
+
+  .menu { flex: 1; overflow-y: auto; padding: 18px 0; }
+  .menu::-webkit-scrollbar { width: 6px; }
+  .menu::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+  .menu a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 20px;
+    text-decoration: none;
+    margin: 10px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 26px;
+    transition: margin 0.3s ease;
+    z-index: 10;
+    position: relative;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 18px;
+    position: sticky;
+    top: 10px;
+    z-index: 50;
+  }
+
+  .profile-circle {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    border: 3px solid #d4af37;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7), 0 0 10px rgba(212,175,55,0.4);
+  }
+  .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+  .topbar {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--sidebar-bg);
+    background-image: var(--wood-texture-sidebar);
+    padding: 12px 20px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    border: 2px solid #d4af37;
+    color: var(--text);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+  }
+  .hamburger { font-size: 26px; cursor: pointer; border: none; background: none; color: var(--text); }
+
+  .card {
+    background: var(--card-bg);
+    background-image: var(--wood-texture-card);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow:
+      0 22px 45px rgba(0,0,0,0.75),
+      inset 0 2px 4px rgba(255,255,255,0.25),
+      inset 0 -4px 8px rgba(0,0,0,0.85);
+    margin-bottom: 22px;
+    border: 3px solid var(--card-border);
+    color: var(--text);
+    position: relative;
+    z-index: 5;
+    overflow: hidden;
+  }
+  .card h2, .card label { color: var(--text); text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+
+  input, select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 6px 0 14px;
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-weight: var(--font-weight);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+    outline: none;
+  }
+
+  .table-wrapper { display: flex; justify-content: center; width: 100%; overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+    background: rgba(254, 243, 199, 0.96);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  }
+  th, td { padding: 9px 7px; border: 1px solid #b45309; text-align: center; color: #1a0c02; white-space: nowrap; }
+  th { background: #5c310e; color: #fef08a; font-weight: bold; }
+
+  /* Dashboard Cards Grid & Customized Circular Card Styles */
+  .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 16px; }
+  .stat-card {
+    background: linear-gradient(145deg, rgba(74, 39, 11, 0.95) 0%, rgba(41, 19, 3, 0.95) 100%);
+    border: 2px solid #d4af37;
+    border-radius: 20px;
+    padding: 16px 14px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 2px 4px rgba(255,255,255,0.2),
+      inset 0 -3px 6px rgba(0,0,0,0.8),
+      0 10px 25px rgba(0,0,0,0.6);
+  }
+  .stat-card h3 { 
+    font-size: 14px; 
+    color: var(--text); 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+    z-index: 6;
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Circle Card Value Text on Left side */
+  .count-number-box {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--wood-texture-btn);
+    border: 2px solid #d4af37;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: var(--font-weight);
+    color: var(--text);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -3px 6px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.6);
+    z-index: 5; /* Higher than marquee so text hides behind circle value */
+  }
+
+  /* Centered Marquee Box restricted up to the circle text boundary */
+  .marquee-box {
+    position: absolute;
+    top: 50%;
+    left: 90px; /* Starts right after the left circle value text boundary */
+    right: 14px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: 2; /* Behind circle */
+    pointer-events: none;
+  }
+  .marquee-text {
+    display: inline-block;
+    font-size: 22px; /* Double Size */
+    font-weight: var(--font-weight);
+    color: var(--text);
+    opacity: 0.85;
+    padding-left: 100%;
+    animation: marqueeAnimation 12s linear infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  @keyframes marqueeAnimation { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+  .master-chart-card {
+    border: 3px solid #d4af37;
+    border-radius: 22px;
+    background: var(--card-bg);
+    background-image: var(--wood-texture-card);
+    padding: 24px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.2);
+    margin-top: 25px;
+  }
+  .chart-3d-wrapper {
+    position: relative;
+    height: 380px;
+    width: 100%;
+    filter: drop-shadow(0px 15px 12px rgba(0, 0, 0, 0.65));
+    transition: all 0.3s ease;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(6px); }
+  .modal.active { display: flex; }
+  .modal-content { background: var(--card-bg); background-image: var(--wood-texture-card); color: var(--text); padding: 26px; border-radius: 22px; width: 90%; max-width: 430px; border: 3px solid #d4af37; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+
+  @media(max-width:1024px){ .dash-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width:768px){
+    .sidebar { left: -270px; } .sidebar.open { left: 0; }
+    .main { margin-left: 0; padding: 14px; } .topbar { display: flex; }
+    .dash-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body onclick="handleOutsideClick(event)">
+
+<svg class="wood-grain-overlay" xmlns="http://www.w3.org/2000/svg">
+  <filter id="woodTexture">
+    <feTurbulence type="fractalNoise" baseFrequency="0.02 0.15" numOctaves="3" result="noise" />
+    <feColorMatrix type="matrix" values="1 0 0 0 0  0 0.6 0 0 0  0 0 0.2 0 0  0 0 0 0.15 0" />
+  </filter>
+  <rect width="100%" height="100%" filter="url(#woodTexture)" />
+</svg>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="logo" id="appLogoTitle">Attendance Pro</div>
+  <div class="menu">
+    <a class="active" onclick="showPage('dashboard',this)" id="menuDash">📊 Dashboard</a>
+    <a onclick="showPage('department',this)" id="menuDept">🏢 Department</a>
+    <a onclick="showPage('shift',this)" id="menuShift">⏰ Work Shift</a>
+    <a onclick="showPage('employee',this)" id="menuEmp">👤 Employee</a>
+    <a onclick="showPage('attendance',this)" id="menuAtt">📝 Attendance</a>
+    <a onclick="showPage('salary',this)" id="menuSalary">💰 Salary</a>
+    <a onclick="showPage('export',this)" id="menuExp">📤 Export</a>
+    <a onclick="showPage('setting',this)" id="menuSetting">⚙️ Setting</a>
+    <a onclick="toggleLanguage()" id="menuLang">🌐 Language: English</a>
+  </div>
+</div>
+
+<!-- Main Section -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar(event)">☰</button>
+    <h3 id="topbarTitle">Attendance Pro App</h3>
+  </div>
+
+  <div class="header">
+    <div style="display:flex; align-items:center; gap:16px; width:100%; justify-content:flex-end;">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <label style="font-size:12px; color:var(--text);">Theme:</label>
+        <select id="topThemeDropdown" onchange="applyTheme(this.value)" style="width:auto; margin:0; padding:4px 8px; font-size:12px;">
+          <option value="woodland">Woodland Craft</option>
+          <option value="pearl">Pearl Glass</option>
+          <option value="midnight">Midnight Slate</option>
+          <option value="emerald">Emerald Velvet</option>
+          <option value="ocean">Ocean Blue</option>
+          <option value="sunset">Sunset Orange</option>
+        </select>
+      </div>
+      <button class="btn small" onclick="quickThemeSwitch()" id="themeToggleBtn">🎨 Switch Theme</button>
+      <div class="profile-circle" onclick="openProfile()">
+        <img id="topProfileImg" src="https://ui-avatars.com/api/?name=Admin">
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Page -->
+  <div id="dashboard" class="page active">
+    <div class="card">
+      <h2 id="lblDashOverview">Dashboard Overview</h2>
+      
+      <div class="dash-grid" id="dashGridContainer">
+        <div class="stat-card">
+          <h3 id="lblTotalDept">Total Department</h3>
+          <div class="count-number-box" id="numDept">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statDept">Departments</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblTotalWorker">Total Worker</h3>
+          <div class="count-number-box" id="numWorker">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statWorker">Workers</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblTodayPresent">Today Present</h3>
+          <div class="count-number-box" id="numPresent">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statPresent">Present</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblTodayAbsent">Today Absent</h3>
+          <div class="count-number-box" id="numAbsent">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statAbsent">Absent</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblTodayLeaves">Today Leaves</h3>
+          <div class="count-number-box" id="numLeaves">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statLeaves">Leaves</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblCL">Casual Leave (CL)</h3>
+          <div class="count-number-box" id="numCL">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statCL">Casual Leave</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblEL">Earned Leave (EL)</h3>
+          <div class="count-number-box" id="numEL">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statEL">Earned Leave</div></div>
+        </div>
+        <div class="stat-card">
+          <h3 id="lblDuty">Duty Leave / Gazetted</h3>
+          <div class="count-number-box" id="numDuty">0</div>
+          <div class="marquee-box"><div class="marquee-text" id="statDuty">Duty/Gazetted</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="master-chart-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <h2>📊 3D / HD Master Analytics Chart</h2>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="margin:0; font-size:13px;"><strong>3D/HD Chart Style:</strong></label>
+          <select id="masterChartStyleSelect" onchange="changeMasterChartStyle(this.value)" style="width:220px; margin:0; padding:6px 12px;">
+            <option value="bar3d" selected>3D Bar Chart (HD Multi-color)</option>
+            <option value="barHoriz3d">3D Horizontal Bar</option>
+            <option value="doughnut3d">3D HD Doughnut Ring</option>
+            <option value="pie3d">3D HD Pie Disc</option>
+            <option value="line3d">3D Curved Area / Line</option>
+            <option value="polar3d">3D Polar Area Globe</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="chart-3d-wrapper">
+        <canvas id="dashboardMasterChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Page -->
+  <div id="department" class="page">
+    <div class="card">
+      <h2 id="lblDeptHeading">Department</h2>
+      <input type="text" id="deptName" placeholder="Department Name">
+      <button class="btn green" onclick="saveDepartment()" id="btnAddDept">Add Department</button>
+      <div id="deptList" class="table-wrapper" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- Shift Page -->
+  <div id="shift" class="page">
+    <div class="card">
+      <h2 id="lblShiftHeading">Work Shift</h2>
+      <div class="grid-3">
+        <div><label id="lblShiftName">Shift Name</label><input type="text" id="shiftName" placeholder="Morning"></div>
+        <div><label id="lblShiftStart">Start Time</label><input type="time" id="shiftStart"></div>
+        <div><label id="lblShiftEnd">End Time</label><input type="time" id="shiftEnd"></div>
+      </div>
+      <button class="btn green" onclick="saveShift()" id="btnAddShift">Add Shift</button>
+      <div id="shiftList" class="table-wrapper" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- Employee Page -->
+  <div id="employee" class="page">
+    <div class="card">
+      <h2 id="lblEmpHeading">Employee</h2>
+      <div class="grid-4">
+        <div><label id="lblEmpId">Employee ID</label><input type="text" id="empId"></div>
+        <div><label id="lblEmpName">Name</label><input type="text" id="empName"></div>
+        <div><label id="lblEmpDept">Department</label><select id="empDept"></select></div>
+        <div><label id="lblEmpShift">Work Shift</label><select id="empShift"></select></div>
+        <div><label id="lblEmpWeeklyOff">Weekly Off Day</label>
+          <select id="empWeeklyOff">
+            <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option>
+            <option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+          </select>
+        </div>
+        <div><label>Basic Salary (Rs.)</label><input type="number" id="empBasicSalary" min="0" value="0"></div>
+        <div><label id="lblEmpJoin">Joining Date</label><input type="date" id="empJoin"></div>
+        <div><label id="lblEmpExit">Exit Date</label><input type="date" id="empExit"></div>
+      </div>
+      <button class="btn green" onclick="saveEmployee()" id="btnAddEmp">Add Employee</button>
+      <div id="empList" class="table-wrapper" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- Attendance Page -->
+  <div id="attendance" class="page">
+    <div class="card">
+      <h2 id="lblAttHeading">Attendance</h2>
+      <div class="grid-4">
+        <div><label id="lblAttView">View</label><select id="attView" onchange="renderAttendance()"><option value="daily">Daily</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+        <div><label id="lblAttDate">Date</label><input type="date" id="attDate" onchange="renderAttendance()"></div>
+        <div><label>Department Filter</label><select id="attDeptFilter" onchange="renderAttendance()"><option value="all">All Departments</option></select></div>
+        <div><label>Shift Filter</label><select id="attShiftFilter" onchange="renderAttendance()"><option value="all">All Shifts</option></select></div>
+      </div>
+      <div style="margin-top: 10px; margin-bottom: 10px;">
+        <button class="btn blue" onclick="markAllPresent()" id="btnMarkAll">Mark All Present P</button>
+      </div>
+      <div id="attendanceTable"></div>
+    </div>
+  </div>
+
+  <!-- SALARY PAGE -->
+  <div id="salary" class="page">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+        <h2 id="lblSalaryHeading">💰 Salary Management & Calculation</h2>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <label style="margin:0;"><strong>Select Month:</strong></label>
+          <input type="month" id="salaryMonth" onchange="renderSalaryPage()" style="width:165px;margin:0;">
+          <label style="margin:0;"><strong>Department:</strong></label>
+          <select id="salaryDeptFilter" onchange="renderSalaryPage()" style="width:160px; margin:0;">
+            <option value="all">All Departments</option>
+          </select>
+          <button class="btn green" onclick="calculateSalary()">Calculate Salary</button>
+        </div>
+      </div>
+
+      <div class="actions-bar" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px; justify-content:flex-end;">
+        <button class="btn small blue" onclick="exportSalaryExcel()">Export to Excel</button>
+        <button class="btn small yellow" onclick="exportSalaryPDF()">Download PDF</button>
+        <button class="btn small green" onclick="exportSalaryPNG()">Download PNG</button>
+      </div>
+
+      <div id="salaryExportContainer" class="table-wrapper">
+        <table id="salaryCalcTable">
+          <thead>
+            <tr>
+              <th>Worker ID</th>
+              <th>Worker Name</th>
+              <th>Department</th>
+              <th>Monthly Salary (Rs.)</th>
+              <th>Present Days</th>
+              <th>Absent Days</th>
+              <th>Absent Deduction (Rs.)</th>
+              <th>ESI Deduction (Rs.)</th>
+              <th>PF Deduction (Rs.)</th>
+              <th>Net Payable (Rs.)</th>
+            </tr>
+          </thead>
+          <tbody id="salaryTableBody"></tbody>
+          <tfoot id="salaryTableFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Salary Master Chart Card -->
+    <div class="card">
+      <h3>📈 Salary Distribution Master Chart</h3>
+      <div style="height: 320px; position: relative; margin-top: 15px;">
+        <canvas id="salaryMasterChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Page -->
+  <div id="export" class="page">
+    <div class="card">
+      <h2 id="lblExpHeading">Export Attendance</h2>
+      <div class="grid-3">
+        <div><label id="lblExpView">Export View</label><select id="expView" onchange="renderExportTable()"><option value="daily" selected>Daily View (A4 Portrait)</option><option value="monthly">Monthly Matrix View (A4 Landscape)</option></select></div>
+        <div><label id="lblExpDate">Select Date / Month</label><input type="date" id="expDate" onchange="renderExportTable()"></div>
+        <div><label id="lblExpDept">Select Department</label><select id="expDeptFilter" onchange="renderExportTable()"><option value="all">All Departments</option></select></div>
+      </div>
+      <div class="grid-3">
+        <div><label id="lblExpShift">Select Work Shift</label><select id="expShiftFilter" onchange="renderExportTable()"><option value="all">All Shifts</option></select></div>
+        <div>
+          <label id="lblPageSize">Page Format</label>
+          <select id="exportPageSize" disabled><option value="a4_port" selected>A4 Format</option></select></div>
+        <div style="display:flex; flex-direction:column; gap:6px; justify-content:flex-end;">
+          <label><input type="checkbox" id="showProfileInExport" onchange="renderExportTable()"> <span id="lblShowProfile">Show Profile in Export</span></label>
+          <label><input type="checkbox" id="showLogoInExport" onchange="renderExportTable()"> <span>Show Company Logo in Export</span></label>
+        </div>
+      </div>
+      
+      <div id="rotateOptionContainer" style="margin:12px 0; display:none;">
+        <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="rotateMonthlyExport" onchange="renderExportTable()" style="width:auto; margin:0;">
+          <span><strong>Rotate Monthly Matrix 90° (Portrait page, full landscape report)</strong></span>
+        </label>
+      </div>
+
+      <button class="btn" onclick="downloadPDF()" id="btnDL_PDF">Download PDF</button>
+      <button class="btn green" onclick="downloadPNG()" id="btnDL_PNG">Download PNG HD</button>
+      
+      <div style="width:100%; overflow:auto; margin-top:20px; background:#f8fafc; padding:12px; border-radius:12px; color:#000;" id="exportContainerWrapper">
+        <div id="exportPagesContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setting Page -->
+  <div id="setting" class="page">
+    <div class="card">
+      <h2 id="lblSetHeading">App Management & Settings</h2>
+      
+      <h3 style="margin-top:22px; font-size:15px; border-bottom:2px solid #d4af37; padding-bottom:6px;">🏢 Company Profile & Branding</h3>
+      <div class="grid-2" style="margin-top:12px;">
+        <div><label>Company Name</label><input type="text" id="settingCompanyName" placeholder="Attendance Pro Inc."></div>
+        <div><label>Company Address</label><input type="text" id="settingCompanyAddress" placeholder="City, Country"></div>
+        <div><label>Company Logo Upload</label><input type="file" id="settingCompanyLogoInput" accept="image/*" onchange="previewCompanyLogo(event)"></div>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <img id="companyLogoPreview" style="width:48px;height:48px;object-fit:cover;border-radius:50%;border:2px solid #d4af37;" src="https://ui-avatars.com/api/?name=Company">
+          <span style="font-size:13px; color:var(--text);">Logo Preview</span>
+        </div>
+      </div>
+
+      <h3 style="margin-top:26px; font-size:15px; border-bottom:2px solid #d4af37; padding-bottom:6px;">🔤 Font & View Settings</h3>
+      <div class="grid-3" style="margin-top:12px;">
+        <div>
+          <label>Export Font Family</label>
+          <select id="settingExportFontFamily" onchange="applyFontSettings()">
+            <option value='"Times New Roman", Times, serif'>Times New Roman</option>
+            <option value='"Arial", sans-serif'>Arial</option>
+            <option value='"Courier New", monospace'>Courier New</option>
+            <option value='"Georgia", serif'>Georgia</option>
+            <option value='"Verdana", sans-serif'>Verdana</option>
+          </select>
+        </div>
+        <div>
+          <label>Export Font Size</label>
+          <select id="settingExportFontSize" onchange="applyFontSettings()">
+            <option value="12px" selected>12px (Standard)</option>
+            <option value="10px">10px (Compact)</option>
+            <option value="14px">14px (Large)</option>
+          </select>
+        </div>
+        <div>
+          <label>3D Theme Selector</label>
+          <select id="settingAppTheme" onchange="applyTheme(this.value)">
+            <option value="woodland" selected>Woodland Craft</option>
+            <option value="pearl">Pearl Glass</option>
+            <option value="midnight">Midnight Slate</option>
+            <option value="emerald">Emerald Velvet</option>
+            <option value="ocean">Ocean Blue</option>
+            <option value="sunset">Sunset Orange</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 style="margin-top:26px; font-size:15px; border-bottom:2px solid #d4af37; padding-bottom:6px;">💾 Database Backup & Restore</h3>
+      <div class="grid-2" style="margin-top:12px;">
+        <div><label>Export Database (JSON Backup)</label><button class="btn blue" onclick="exportDatabaseJSON()" style="margin-top:6px; width:100%;">📥 Download Backup</button></div>
+        <div><label>Restore Database from JSON</label><input type="file" id="importJsonFile" accept=".json" onchange="importDatabaseJSON(event)"></div>
+      </div>
+
+      <button class="btn green" style="margin-top:22px;" onclick="saveCustomization()" id="btnSaveCustom">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal" id="profileModal">
+  <div class="modal-content">
+    <h3 id="lblProfTitle">Profile</h3>
+    <label id="lblProfImg">Profile Image</label>
+    <input type="file" id="profileImg" accept="image/*" onchange="previewProfile(event)">
+    <img id="profilePreview" style="width:84px;height:84px;border-radius:50%;margin:12px 0;object-fit:cover;border:3px solid #d4af37;">
+    <label id="lblProfName">Name</label><input type="text" id="profileName">
+    <label id="lblProfRole">Role</label><input type="text" id="profileRole">
+    <button class="btn green" onclick="saveProfile()" id="btnProfSave">Save</button>
+    <button class="btn" onclick="closeProfile()" id="btnProfCancel">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* Central Database State */
+let DB = JSON.parse(localStorage.getItem('attendanceDB')) || {
+  departments:[{id:1,name:"HR"},{id:2,name:"IT"}],
+  shifts:[{id:1,name:"Morning",start:"09:00",end:"18:00"}],
+  employees:[{id:"101",name:"Rahul Sharma",dept:1,shift:1,weeklyOff:0,salary:22000,esi:0,pf:0,netSalary:0,join:"2025-01-01",exit:""}],
+  attendance:{},
+  dailyShifts:{},
+  profile:{name:"Admin",role:"Manager",img:"https://ui-avatars.com/api/?name=Admin"},
+  company:{name:"Attendance Pro Inc.", address:"123 Corporate Ave", logo:""},
+  settings:{ theme:'woodland', font:'"Times New Roman", Times, serif', fontSize:'12px', masterChartStyle:'bar3d' },
+  lang:'en'
+};
+
+if(!DB.settings) DB.settings = { theme:'woodland', font:'"Times New Roman", Times, serif', fontSize:'12px', masterChartStyle:'bar3d' };
+
+function saveDB(){ localStorage.setItem('attendanceDB', JSON.stringify(DB)); }
+
+let editingDeptId = null;
+let editingShiftId = null;
+let editingEmpOriginalId = null;
+let tempCompanyLogo = "";
+let dashboardMasterChartInstance = null;
+let salaryChartInstance = null;
+
+const TRANSLATIONS = {
+  en: {
+    appTitle: "Attendance Pro",
+    dash: "📊 Dashboard", dept: "🏢 Department", shift: "⏰ Work Shift", emp: "👤 Employee",
+    att: "📝 Attendance", salary: "💰 Salary", exp: "📤 Export", set: "⚙️ Setting",
+    dashOverview: "Dashboard Overview", totalDept: "Total Department", totalWorker: "Total Worker",
+    todayPres: "Today Present", todayAbs: "Today Absent", todayLeave: "Today Leaves",
+    cl: "Casual Leave (CL)", el: "Earned Leave (EL)", duty: "Duty Leave / Gazetted",
+    deptHeading: "Department", deptNamePh: "Department Name", addDeptBtn: "Add Department", updateDeptBtn: "Update Department",
+    shiftHeading: "Work Shift", shiftName: "Shift Name", shiftStart: "Start Time", shiftEnd: "End Time", addShiftBtn: "Add Shift", updateShiftBtn: "Update Shift",
+    empHeading: "Employee", empId: "Employee ID", empName: "Name", empDept: "Department", empShift: "Work Shift", empJoin: "Joining Date", empExit: "Exit Date", addEmpBtn: "Add Employee", updateEmpBtn: "Update Employee",
+    attHeading: "Attendance", attView: "View", attDate: "Date", markAll: "Mark All Present P",
+    expHeading: "Export Attendance", expDate: "Select Date", expDept: "Select Department", expShift: "Select Work Shift", pageSizeLabel: "Page Format", showProf: "Show Profile in Export", dlPDF: "Download PDF", dlPNG: "Download PNG HD",
+    setHeading: "App Management & Settings", saveCustom: "Save Settings",
+    profTitle: "Profile", profImg: "Profile Image", profName: "Name", profRole: "Role", profSave: "Save", profCancel: "Cancel",
+    statusPresent: "PRESENT", statusDouble: "DOUBLE SHIFT (2P)", statusAbsent: "ABSENT", statusHalf: "1/2 DAY", statusCL: "CASUAL LEAVE", statusEL: "EARNED LEAVE", statusGaz: "GAZETTED", statusWf: "WEEKLY OFF"
+  },
+  hi: {
+    appTitle: "उपस्थिति प्रो",
+    dash: "📊 डैशबोर्ड", dept: "🏢 विभाग", shift: "⏰ कार्य शिफ्ट", emp: "👤 कर्मचारी",
+    att: "📝 उपस्थिति", salary: "💰 वेतन", exp: "📤 एक्सपोर्ट", set: "⚙️ सेटिंग",
+    dashOverview: "डैशबोर्ड सारांश", totalDept: "कुल विभाग", totalWorker: "कुल कर्मचारी",
+    todayPres: "आज उपस्थित", todayAbs: "आज अनुपस्थित", todayLeave: "आज का अवकाश",
+    cl: "आकस्मिक अवकाश (CL)", el: "अर्जित अवकाश (EL)", duty: "ड्यूटी अवकाश / राजपत्रित",
+    deptHeading: "विभाग", deptNamePh: "विभाग का नाम", addDeptBtn: "विभाग जोड़ें", updateDeptBtn: "विभाग अपडेट करें",
+    shiftHeading: "कार्य शिफ्ट", shiftName: "शिफ्ट का नाम", shiftStart: "प्रारंभ समय", shiftEnd: "समाप्ति समय", addShiftBtn: "शिफ्ट जोड़ें", updateShiftBtn: "शिफ्ट अपडेट करें",
+    empHeading: "कर्मचारी", empId: "कर्मचारी आईडी", empName: "नाम", empDept: "विभाग", empShift: "कार्य शिफ्ट", empJoin: "joining तिथि", empExit: "निकास तिथि", addEmpBtn: "कर्मचारी जोड़ें", updateEmpBtn: "कर्मचारी अपडेट करें",
+    attHeading: "उपस्थिति", attView: "दृश्य", attDate: "दिनांक", markAll: "सभी को उपस्थित P चिह्नित करें",
+    expHeading: "उपस्थिति एक्सपोर्ट", expDate: "दिनांक चुनें", expDept: "विभाग चुनें", expShift: "कार्य शिफ्ट चुनें", pageSizeLabel: "पेज फॉर्मेट", showProf: "एक्सपोर्ट में प्रोफाइल दिखाएं", dlPDF: "PDF डाउनलोड करें", dlPNG: "PNG HD डाउनलोड करें",
+    setHeading: "ऐप प्रबंधन और सेटिंग्स", saveCustom: "सेटिंग्स सहेजें",
+    profTitle: "प्रोफ़ाइल", profImg: "प्रोफ़ाइल छवि", profName: "नाम", profRole: "भूमिका", profSave: "सहेजें", profCancel: "रद्द करें",
+    statusPresent: "उपस्थित", statusDouble: "डबल शिफ्ट (2P)", statusAbsent: "अनुपस्थित", statusHalf: "आधा दिन", statusCL: "आकस्मिक अवकाश", statusEL: "अर्जित अवकाश", statusGaz: "राजपत्रित", statusWf: "साप्ताहिक अवकाश"
+  }
+};
+
+function t(key){
+  const lang = DB.lang || 'en';
+  return TRANSLATIONS[lang][key] || TRANSLATIONS['en'][key] || key;
+}
+
+function toggleLanguage(){
+  DB.lang = (DB.lang === 'hi') ? 'en' : 'hi';
+  saveDB();
+  applyLanguageUI();
+  loadPageData(document.querySelector('.page.active').id);
+}
+
+function applyTheme(themeName) {
+  DB.settings.theme = themeName;
+  if(themeName === 'woodland') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', themeName);
+  }
+  const el = document.getElementById('settingAppTheme');
+  if(el) el.value = themeName;
+  const topEl = document.getElementById('topThemeDropdown');
+  if(topEl) topEl.value = themeName;
+  saveDB();
+  document.documentElement.style.colorScheme = (themeName === 'pearl') ? 'light' : 'dark';
+}
+
+function quickThemeSwitch() {
+  const themes = ['woodland', 'pearl', 'midnight', 'emerald', 'ocean', 'sunset'];
+  const currentIdx = themes.indexOf(DB.settings.theme || 'woodland');
+  const nextTheme = themes[(currentIdx + 1) % themes.length];
+  applyTheme(nextTheme);
+}
+
+function applyFontSettings() {
+  const fontFamily = document.getElementById('settingExportFontFamily').value;
+  const fontSize = document.getElementById('settingExportFontSize').value;
+  DB.settings.font = fontFamily;
+  DB.settings.fontSize = fontSize;
+  document.documentElement.style.setProperty('--font', fontFamily);
+  saveDB();
+}
+
+function initSettingsUI() {
+  const s = DB.settings;
+  if(!s) return;
+  if(s.theme) applyTheme(s.theme);
+  if(s.font) document.getElementById('settingExportFontFamily').value = s.font;
+  if(s.fontSize) document.getElementById('settingExportFontSize').value = s.fontSize;
+  if(s.masterChartStyle) document.getElementById('masterChartStyleSelect').value = s.masterChartStyle;
+  applyFontSettings();
+}
+
+function applyLanguageUI(){
+  const lang = DB.lang || 'en';
+  document.getElementById('appLogoTitle').innerText = t('appTitle');
+  document.getElementById('topbarTitle').innerText = t('appTitle');
+  document.getElementById('menuDash').innerText = t('dash');
+  document.getElementById('menuDept').innerText = t('dept');
+  document.getElementById('menuShift').innerText = t('shift');
+  document.getElementById('menuEmp').innerText = t('emp');
+  document.getElementById('menuAtt').innerText = t('att');
+  document.getElementById('menuSalary').innerText = t('salary');
+  document.getElementById('menuExp').innerText = t('exp');
+  document.getElementById('menuSetting').innerText = t('set');
+  document.getElementById('menuLang').innerText = (lang === 'hi') ? "🌐 भाषा: हिंदी" : "🌐 Language: English";
+
+  document.getElementById('lblDashOverview').innerText = t('dashOverview');
+  document.getElementById('lblTotalDept').innerText = t('totalDept');
+  document.getElementById('lblTotalWorker').innerText = t('totalWorker');
+  document.getElementById('lblTodayPresent').innerText = t('todayPres');
+  document.getElementById('lblTodayAbsent').innerText = t('todayAbs');
+  document.getElementById('lblTodayLeaves').innerText = t('todayLeave');
+  document.getElementById('lblCL').innerText = t('cl');
+  document.getElementById('lblEL').innerText = t('el');
+  document.getElementById('lblDuty').innerText = t('duty');
+
+  document.getElementById('lblDeptHeading').innerText = t('deptHeading');
+  document.getElementById('deptName').placeholder = t('deptNamePh');
+  document.getElementById('btnAddDept').innerText = editingDeptId ? t('updateDeptBtn') : t('addDeptBtn');
+
+  document.getElementById('lblShiftHeading').innerText = t('shiftHeading');
+  document.getElementById('lblShiftName').innerText = t('shiftName');
+  document.getElementById('lblShiftStart').innerText = t('shiftStart');
+  document.getElementById('lblShiftEnd').innerText = t('shiftEnd');
+  document.getElementById('btnAddShift').innerText = editingShiftId ? t('updateShiftBtn') : t('addShiftBtn');
+
+  document.getElementById('lblEmpHeading').innerText = t('empHeading');
+  document.getElementById('lblEmpId').innerText = t('empId');
+  document.getElementById('lblEmpName').innerText = t('empName');
+  document.getElementById('lblEmpDept').innerText = t('empDept');
+  document.getElementById('lblEmpShift').innerText = t('empShift');
+  document.getElementById('lblEmpWeeklyOff').innerText = DB.lang==='hi'?'साप्ताहिक अवकाश दिन':'Weekly Off Day';
+  document.getElementById('lblEmpJoin').innerText = t('empJoin');
+  document.getElementById('lblEmpExit').innerText = t('empExit');
+  document.getElementById('btnAddEmp').innerText = editingEmpOriginalId ? t('updateEmpBtn') : t('addEmpBtn');
+
+  document.getElementById('lblAttHeading').innerText = t('attHeading');
+  document.getElementById('lblAttView').innerText = t('attView');
+  document.getElementById('lblAttDate').innerText = t('attDate');
+  document.getElementById('btnMarkAll').innerText = t('markAll');
+
+  document.getElementById('lblExpHeading').innerText = t('expHeading');
+  document.getElementById('lblExpDate').innerText = t('expDate');
+  document.getElementById('lblExpDept').innerText = t('expDept');
+  document.getElementById('lblExpShift').innerText = t('expShift');
+  document.getElementById('lblPageSize').innerText = t('pageSizeLabel');
+  document.getElementById('lblShowProfile').innerText = t('showProf');
+  document.getElementById('btnDL_PDF').innerText = t('dlPDF');
+  document.getElementById('btnDL_PNG').innerText = t('dlPNG');
+
+  document.getElementById('lblSetHeading').innerText = t('setHeading');
+  document.getElementById('btnSaveCustom').innerText = t('saveCustom');
+
+  document.getElementById('lblProfTitle').innerText = t('profTitle');
+  document.getElementById('lblProfImg').innerText = t('profImg');
+  document.getElementById('lblProfName').innerText = t('profName');
+  document.getElementById('lblProfRole').innerText = t('profRole');
+  document.getElementById('btnProfSave').innerText = t('profSave');
+  document.getElementById('btnProfCancel').innerText = t('profCancel');
+}
+
+function previewCompanyLogo(event) {
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempCompanyLogo = e.target.result;
+      document.getElementById('companyLogoPreview').src = tempCompanyLogo;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function loadCustomizationUI(){
+  if(DB.company){
+    document.getElementById('settingCompanyName').value = DB.company.name || '';
+    document.getElementById('settingCompanyAddress').value = DB.company.address || '';
+    tempCompanyLogo = DB.company.logo || '';
+    document.getElementById('companyLogoPreview').src = tempCompanyLogo || 'https://ui-avatars.com/api/?name=Company';
+  }
+}
+
+function saveCustomization(){
+  DB.company = {
+    name: document.getElementById('settingCompanyName').value.trim(),
+    address: document.getElementById('settingCompanyAddress').value.trim(),
+    logo: tempCompanyLogo
+  };
+  saveDB();
+  alert(DB.lang === 'hi' ? 'सेटिंग्स सफलतापूर्वक सहेज ली गई हैं!' : 'Settings saved successfully!');
+}
+
+function exportDatabaseJSON(){
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DB, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `Attendance_Backup_${new Date().toISOString().split('T')[0]}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+function importDatabaseJSON(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const importedDB = JSON.parse(e.target.result);
+      if(importedDB && importedDB.departments && importedDB.employees){
+        if(confirm(DB.lang === 'hi' ? 'डेटाबेस रिस्टोर करें?' : 'Are you sure you want to restore database?')){
+          DB = importedDB;
+          saveDB();
+          location.reload();
+        }
+      } else { alert("Invalid backup format!"); }
+    } catch(err){ alert("Failed to parse JSON file."); }
+  };
+  reader.readAsText(file);
+}
+
+function toggleSidebar(e){
+  if(e) e.stopPropagation();
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function handleOutsideClick(e){
+  const sidebar = document.getElementById('sidebar');
+  if(window.innerWidth <= 768 && sidebar.classList.contains('open')){
+    if(!sidebar.contains(e.target) && !e.target.classList.contains('hamburger')){
+      sidebar.classList.remove('open');
+    }
+  }
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  loadPageData(id);
+}
+
+function openProfile(){
+  document.getElementById('profileModal').classList.add('active');
+  document.getElementById('profileName').value = DB.profile.name;
+  document.getElementById('profileRole').value = DB.profile.role;
+  document.getElementById('profilePreview').src = DB.profile.img;
+}
+function closeProfile(){ document.getElementById('profileModal').classList.remove('active'); }
+function previewProfile(e){ const fr=new FileReader(); fr.onload=()=>document.getElementById('profilePreview').src=fr.result; fr.readAsDataURL(e.target.files[0]); }
+function saveProfile(){
+  DB.profile.name = document.getElementById('profileName').value;
+  DB.profile.role = document.getElementById('profileRole').value;
+  DB.profile.img = document.getElementById('profilePreview').src;
+  saveDB(); updateProfileUI(); closeProfile();
+}
+function updateProfileUI(){ document.getElementById('topProfileImg').src = DB.profile.img; }
+
+// Department Functions
+function saveDepartment(){
+  const name = document.getElementById('deptName').value.trim();
+  if(!name) return alert('Please enter department name');
+  if(editingDeptId){
+    const dept = DB.departments.find(d => d.id === editingDeptId);
+    if(dept) dept.name = name;
+    editingDeptId = null;
+  } else {
+    DB.departments.push({id:Date.now(), name});
+  }
+  saveDB();
+  document.getElementById('deptName').value='';
+  applyLanguageUI();
+  renderDepartments();
+}
+function editDepartment(id){
+  const dept = DB.departments.find(d => d.id === id);
+  if(dept){ document.getElementById('deptName').value = dept.name; editingDeptId = id; applyLanguageUI(); }
+}
+function deleteDepartment(id){
+  if(confirm('Delete department?')){
+    DB.employees = DB.employees.filter(e=>e.dept!=id);
+    DB.departments = DB.departments.filter(d=>d.id!=id);
+    saveDB(); renderDepartments();
+  }
+}
+function renderDepartments(){
+  let html='<table><thead><tr><th>#</th><th>Name</th><th>Action</th></tr></thead><tbody>';
+  DB.departments.forEach((d,i)=>{
+    html+=`<tr><td>${i+1}</td><td>${d.name}</td><td>
+      <button class="btn small yellow" onclick="editDepartment(${d.id})">Edit</button>
+      <button class="btn small red" onclick="deleteDepartment(${d.id})">Delete</button>
+    </td></tr>`;
+  });
+  html+='</tbody></table>'; document.getElementById('deptList').innerHTML=html;
+  let opts=DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('empDept').innerHTML=opts;
+  renderDashboardStats();
+}
+
+// Work Shift Functions
+function format12h(t){ let [h,m]=t.split(':'); h=+h; return (h%12||12)+':'+m+' '+(h<12?'AM':'PM'); }
+function saveShift(){
+  const name = document.getElementById('shiftName').value.trim();
+  const start = document.getElementById('shiftStart').value;
+  const end = document.getElementById('shiftEnd').value;
+  if(!name||!start||!end) return alert('Fill all fields');
+  if(editingShiftId){
+    const shift = DB.shifts.find(s => s.id === editingShiftId);
+    if(shift){ shift.name = name; shift.start = start; shift.end = end; }
+    editingShiftId = null;
+  } else {
+    DB.shifts.push({id:Date.now(), name, start, end});
+  }
+  saveDB();
+  document.getElementById('shiftName').value=''; document.getElementById('shiftStart').value=''; document.getElementById('shiftEnd').value='';
+  applyLanguageUI(); renderShifts();
+}
+function editShift(id){
+  const shift = DB.shifts.find(s => s.id === id);
+  if(shift){ document.getElementById('shiftName').value = shift.name; document.getElementById('shiftStart').value = shift.start; document.getElementById('shiftEnd').value = shift.end; editingShiftId = id; applyLanguageUI(); }
+}
+function deleteShift(id){
+  if(confirm('Delete shift?')){ DB.shifts=DB.shifts.filter(s=>s.id!=id); saveDB(); renderShifts(); }
+}
+function renderShifts(){
+  let html='<table><thead><tr><th>#</th><th>Name</th><th>Time</th><th>Action</th></tr></thead><tbody>';
+  DB.shifts.forEach((s,i)=>{
+    html+=`<tr><td>${i+1}</td><td>${s.name}</td><td>${format12h(s.start)} - ${format12h(s.end)}</td><td>
+      <button class="btn small yellow" onclick="editShift(${s.id})">Edit</button>
+      <button class="btn small red" onclick="deleteShift(${s.id})">Delete</button>
+    </td></tr>`;
+  });
+  html+='</tbody></table>'; document.getElementById('shiftList').innerHTML=html;
+  let opts=DB.shifts.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('empShift').innerHTML=opts;
+}
+
+// Employee Functions
+function saveEmployee(){
+  const id = document.getElementById('empId').value.trim();
+  const name = document.getElementById('empName').value.trim();
+  const dept = +document.getElementById('empDept').value;
+  const shift = +document.getElementById('empShift').value;
+  const weeklyOff = +document.getElementById('empWeeklyOff').value;
+  const basicSalary = parseFloat(document.getElementById('empBasicSalary').value) || 0;
+  const join = document.getElementById('empJoin').value;
+  const exit = document.getElementById('empExit').value;
+  if(!id||!name) return alert('Fill ID and Name');
+  if(editingEmpOriginalId){ DB.employees = DB.employees.filter(e => e.id !== editingEmpOriginalId); editingEmpOriginalId = null; }
+  DB.employees.push({id, name, dept, shift, weeklyOff, salary: basicSalary, esi:0, pf:0, netSalary: basicSalary, join, exit});
+  saveDB();
+  document.getElementById('empId').value=''; document.getElementById('empName').value=''; document.getElementById('empBasicSalary').value='0'; document.getElementById('empJoin').value=''; document.getElementById('empExit').value='';
+  applyLanguageUI(); renderEmployees();
+}
+function editEmployee(id){
+  const e = DB.employees.find(x => x.id === id);
+  if(e){
+    document.getElementById('empId').value = e.id; document.getElementById('empName').value = e.name;
+    document.getElementById('empDept').value = e.dept; document.getElementById('empShift').value = e.shift;
+    document.getElementById('empWeeklyOff').value = e.weeklyOff !== undefined ? e.weeklyOff : 0;
+    document.getElementById('empBasicSalary').value = e.salary || 0;
+    document.getElementById('empJoin').value = e.join || ''; document.getElementById('empExit').value = e.exit || '';
+    editingEmpOriginalId = id; applyLanguageUI();
+  }
+}
+function deleteEmployee(id){
+  if(confirm('Delete employee?')){ DB.employees=DB.employees.filter(e=>e.id!=id); saveDB(); renderEmployees(); }
+}
+function renderEmployees(){
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  let html='<table><thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Shift</th><th>Weekly Off</th><th>Basic Salary</th><th>Join</th><th>Exit</th><th>Action</th></tr></thead><tbody>';
+  DB.employees.forEach(e=>{
+    const d = DB.departments.find(x=>x.id==e.dept)?.name||'-';
+    const s = DB.shifts.find(x=>x.id==e.shift)?.name||'-';
+    const offDay = dayNames[e.weeklyOff !== undefined ? e.weeklyOff : 0];
+    html+=`<tr><td>${e.id}</td><td>${e.name}</td><td>${d}</td><td>${s}</td><td>${offDay}</td><td>Rs. ${(e.salary||0).toFixed(2)}</td><td>${e.join||'-'}</td><td>${e.exit||'-'}</td><td>
+      <button class="btn small yellow" onclick="editEmployee('${e.id}')">Edit</button>
+      <button class="btn small red" onclick="deleteEmployee('${e.id}')">Delete</button>
+    </td></tr>`;
+  });
+  html+='</tbody></table>'; document.getElementById('empList').innerHTML=html; renderDashboardStats();
+}
+
+const STATUS=['P','2P','A','H','CL','EL','GAZ','WF'];
+function getStatusText(st){
+  const map = { P: t('statusPresent'), '2P': t('statusDouble'), A: t('statusAbsent'), H: t('statusHalf'), CL: t('statusCL'), EL: t('statusEL'), GAZ: t('statusGaz'), WF: t('statusWf') };
+  return map[st] || st;
+}
+function isEmployeeActive(e, date){
+  if(!e.join) return true;
+  if(date < e.join) return false;
+  if(e.exit && date > e.exit) return false;
+  return true;
+}
+function getDefaultStatus(e, dateStr){
+  const dateObj = new Date(dateStr);
+  const dayOfWeek = dateObj.getDay(); 
+  const empOff = e.weeklyOff !== undefined ? e.weeklyOff : 0;
+  if(dayOfWeek === empOff) return 'WF';
+  return 'P';
+}
+function getEmployeeShiftForDate(e, dateStr){
+  if(DB.dailyShifts && DB.dailyShifts[dateStr] && DB.dailyShifts[dateStr][e.id]){ return DB.dailyShifts[dateStr][e.id]; }
+  return e.shift;
+}
+function setEmployeeShiftForDate(empId, shiftId){
+  const date = document.getElementById('attDate').value;
+  if(!DB.dailyShifts) DB.dailyShifts = {};
+  if(!DB.dailyShifts[date]) DB.dailyShifts[date] = {};
+  DB.dailyShifts[date][empId] = +shiftId;
+  saveDB(); renderAttendance();
+}
+function ensureDefaultPresent(date){
+  if(!DB.attendance[date]) DB.attendance[date]={};
+  const today = new Date().toISOString().split('T')[0];
+  if(date===today){
+    DB.employees.forEach(e=>{ if(isEmployeeActive(e,date) && !DB.attendance[date][e.id]) { DB.attendance[date][e.id] = getDefaultStatus(e, date); } });
+    saveDB();
+  }
+}
+function markAttendance(empId,status){
+  const date = document.getElementById('attDate').value;
+  if(!DB.attendance[date]) DB.attendance[date]={};
+  DB.attendance[date][empId]=status; saveDB(); renderAttendance();
+}
+function markAllPresent(){
+  const date = document.getElementById('attDate').value;
+  if(!DB.attendance[date]) DB.attendance[date]={};
+  DB.employees.forEach(e=>{ if(isEmployeeActive(e,date)) DB.attendance[date][e.id]='P'; });
+  saveDB(); renderAttendance();
+}
+
+function initAttendanceFilters(){
+  let deptOpts = `<option value="all">All Departments</option>` + DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('attDeptFilter').innerHTML = deptOpts;
+  let shiftOpts = `<option value="all">All Shifts</option>` + DB.shifts.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('attShiftFilter').innerHTML = shiftOpts;
+}
+
+function renderAttendance(){
+  const date = document.getElementById('attDate').value||new Date().toISOString().split('T')[0];
+  document.getElementById('attDate').value=date;
+  ensureDefaultPresent(date);
+
+  const selectedDept = document.getElementById('attDeptFilter').value;
+  const selectedShift = document.getElementById('attShiftFilter').value;
+
+  let filteredEmps = DB.employees.filter(e => {
+    if(!isEmployeeActive(e, date)) return false;
+    if(selectedDept !== 'all' && String(e.dept) !== selectedDept) return false;
+    const currentShift = getEmployeeShiftForDate(e, date);
+    if(selectedShift !== 'all' && String(currentShift) !== selectedShift) return false;
+    return true;
+  });
+
+  let html='<table><thead><tr><th>ID</th><th>Worker Name</th><th>Shift</th><th>Attendance Status</th></tr></thead><tbody>';
+
+  filteredEmps.forEach(e=>{
+    const defSt = getDefaultStatus(e, date);
+    const st = DB.attendance[date]?.[e.id]||defSt;
+    const currentShiftId = getEmployeeShiftForDate(e, date);
+
+    html+=`<tr><td>${e.id}</td><td><b>${e.name}</b></td>`;
+    let shiftSelectHtml = `<select style="width:130px; margin:0;" onchange="setEmployeeShiftForDate('${e.id}', this.value)">`;
+    DB.shifts.forEach(s => { shiftSelectHtml += `<option value="${s.id}" ${s.id == currentShiftId ? 'selected' : ''}>${s.name}</option>`; });
+    shiftSelectHtml += `</select>`;
+    html += `<td>${shiftSelectHtml}</td>`;
+    html+=`<td>
+      <span id="badge_${e.id}" class="status-badge" onclick="toggleStatusSelect('${e.id}')">${getStatusText(st)}</span>
+      <select id="select_${e.id}" class="status-select" style="display:none;" onchange="markAttendance('${e.id}',this.value)">`;
+    STATUS.forEach(s=>html+=`<option value="${s}" ${st==s?'selected':''}>${getStatusText(s)}</option>`);
+    html+=`</select></td></tr>`;
+  });
+  html+='</tbody></table>'; document.getElementById('attendanceTable').innerHTML=html;
+  renderDashboardStats();
+}
+
+function toggleStatusSelect(empId){
+  document.querySelectorAll('.status-select').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.status-badge').forEach(b=>b.style.display='inline-block');
+  document.getElementById('select_'+empId).style.display='inline-block';
+  document.getElementById('badge_'+empId).style.display='none';
+}
+
+/* SALARY MANAGEMENT MODULE */
+function initSalaryModule(){
+  let filterOpts = `<option value="all">All Departments</option>` + DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('salaryDeptFilter').innerHTML = filterOpts;
+  renderSalaryPage();
+}
+
+function renderSalaryPage(){
+  const filter = document.getElementById('salaryDeptFilter').value;
+  const tbody = document.getElementById('salaryTableBody');
+  const tfoot = document.getElementById('salaryTableFoot');
+  
+  let emps = filter === 'all' ? DB.employees : DB.employees.filter(e => e.dept == filter);
+  
+  let totalBasic = 0, totalEsi = 0, totalPf = 0, totalNet = 0;
+
+  tbody.innerHTML = emps.map(e => {
+    const deptName = DB.departments.find(d => d.id == e.dept)?.name || '-';
+    const basicVal = e.salary || 0;
+    const esiVal = e.esi || 0;
+    const pfVal = e.pf || 0;
+    const netVal = e.netSalary !== undefined ? e.netSalary : basicVal;
+
+    totalBasic += basicVal;
+    totalEsi += esiVal;
+    totalPf += pfVal;
+    totalNet += netVal;
+
+    return `
+      <tr>
+        <td><strong>${e.id}</strong></td>
+        <td>${e.name}</td>
+        <td>${deptName}</td>
+        <td>
+          <input type="number" value="${basicVal}" style="width:110px; margin:0;" onchange="updateEmployeeBasicSalary('${e.id}', this.value)" min="0">
+        </td>
+        <td>Rs. ${esiVal.toFixed(2)}</td>
+        <td>Rs. ${pfVal.toFixed(2)}</td>
+        <td><strong>Rs. ${netVal.toFixed(2)}</strong></td>
+      </tr>
+    `;
+  }).join('');
+
+  // Total Footer Row
+  tfoot.innerHTML = `
+    <tr style="background:#e2e8f0; font-weight:bold;">
+      <td colspan="3" style="text-align:right;">TOTAL:</td>
+      <td>Rs. ${totalBasic.toFixed(2)}</td>
+      <td>Rs. ${totalEsi.toFixed(2)}</td>
+      <td>Rs. ${totalPf.toFixed(2)}</td>
+      <td><strong>Rs. ${totalNet.toFixed(2)}</strong></td>
+    </tr>
+  `;
+
+  renderSalaryMasterChart();
+}
+
+function updateEmployeeBasicSalary(empId, val){
+  const e = DB.employees.find(x => x.id === empId);
+  if(e){
+    e.salary = parseFloat(val) || 0;
+    saveDB();
+  }
+}
+
+function calculateSalary(){
+  DB.employees.forEach(e => {
+    let currentAmount = e.salary || 0;
+    let esiDeduction = 0;
+    let pfDeduction = 0;
+
+    if(e.salary <= 25000 && e.salary > 0){
+      esiDeduction = currentAmount * 0.0075;
+      currentAmount = currentAmount - esiDeduction;
+    }
+
+    pfDeduction = currentAmount * 0.12;
+    currentAmount = currentAmount - pfDeduction;
+
+    e.esi = esiDeduction;
+    e.pf = pfDeduction;
+    e.netSalary = Math.max(0, currentAmount);
+  });
+
+  saveDB();
+  renderSalaryPage();
+  alert(DB.lang === 'hi' ? 'वेतन की गणना सफलतापूर्वक हो गई है!' : 'Salary calculated successfully!');
+}
+
+function renderSalaryMasterChart(){
+  const ctx = document.getElementById('salaryMasterChart');
+  if(!ctx) return;
+
+  const deptTotals = {};
+  DB.departments.forEach(d => deptTotals[d.name] = 0);
+  
+  DB.employees.forEach(e => {
+    const dName = DB.departments.find(d => d.id == e.dept)?.name || 'Other';
+    deptTotals[dName] = (deptTotals[dName] || 0) + (e.netSalary || 0);
+  });
+
+  if(salaryChartInstance){ salaryChartInstance.destroy(); }
+
+  salaryChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(deptTotals),
+      datasets: [{
+        label: 'Net Payable Salary (Rs.)',
+        data: Object.values(deptTotals),
+        backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444'],
+        borderWidth: 2,
+        borderColor: '#d4af37'
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+function exportSalaryExcel(){
+  const month = document.getElementById('salaryMonth')?.value || new Date().toISOString().slice(0,7);
+  const rows = [
+    ['Salary Month', month],
+    [],
+    ['Worker ID', 'Worker Name', 'Department', 'Monthly Salary (Rs.)', 'Present Days', 'Absent Days', 'Absent Deduction (Rs.)', 'ESI Deduction (Rs.)', 'PF Deduction (Rs.)', 'Net Payable (Rs.)']
+  ];
+  
+  const filter = document.getElementById('salaryDeptFilter').value;
+  const emps = filter === 'all' ? DB.employees : DB.employees.filter(e => String(e.dept) === String(filter));
+  
+  let sums = { salary: 0, present: 0, absent: 0, deduct: 0, esi: 0, pf: 0, net: 0 };
+  
+  emps.forEach(e => {
+    const v = typeof salaryMonthData === 'function' ? salaryMonthData(e, month) : {
+      presentDays: 0, absentDays: 0, absentDeduction: 0, esi: e.esi||0, pf: e.pf||0, net: e.netSalary||(e.salary||0)
+    };
+    const basic = e.salary || 0;
+    sums.salary += basic;
+    sums.present += v.presentDays;
+    sums.absent += v.absentDays;
+    sums.deduct += v.absentDeduction;
+    sums.esi += v.esi;
+    sums.pf += v.pf;
+    sums.net += v.net;
+
+    rows.push([
+      e.id,
+      e.name,
+      DB.departments.find(d => d.id == e.dept)?.name || '-',
+      basic,
+      v.presentDays,
+      v.absentDays,
+      v.absentDeduction,
+      v.esi,
+      v.pf,
+      v.net
+    ]);
+  });
+
+  // Append Total Row to Excel Sheet
+  rows.push([
+    'TOTAL',
+    '',
+    '',
+    sums.salary,
+    sums.present,
+    sums.absent,
+    sums.deduct,
+    sums.esi,
+    sums.pf,
+    sums.net
+  ]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, "Salary Sheet");
+  XLSX.writeFile(wb, `Worker_Salary_${month}.xlsx`);
+}
+
+function exportSalaryPDF(){
+  const { jsPDF } = window.jspdf;
+  const element = document.getElementById('salaryExportContainer');
+  html2canvas(element, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+    pdf.save('Worker_Salary_Report.pdf');
+  });
+}
+
+function exportSalaryPNG(){
+  const element = document.getElementById('salaryExportContainer');
+  html2canvas(element).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'Worker_Salary_Report.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+/* EXPORT MODULE LOGIC */
+function initExportFilters(){
+  let deptOpts = `<option value="all">All Departments</option>` + DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('expDeptFilter').innerHTML = deptOpts;
+  let shiftOpts = `<option value="all">All Shifts</option>` + DB.shifts.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('expShiftFilter').innerHTML = shiftOpts;
+}
+
+function renderExportTable(){
+  const view = document.getElementById('expView').value;
+  const dateVal = document.getElementById('expDate').value || new Date().toISOString().split('T')[0];
+  const deptFilter = document.getElementById('expDeptFilter').value;
+  const shiftFilter = document.getElementById('expShiftFilter').value;
+  const showProfile = document.getElementById('showProfileInExport').checked;
+  const showLogo = document.getElementById('showLogoInExport').checked;
+
+  let container = document.getElementById('exportPagesContainer');
+  let html = `<div class="export-plain" style="width:100%; max-width:800px;">`;
+
+  // Header Section with Logo & Profile if checked
+  html += `<div style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:15px;">`;
+  
+  if(showLogo && DB.company && DB.company.logo){
+    html += `<div style="display:flex; align-items:center; gap:10px;"><img src="${DB.company.logo}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div><strong>${DB.company.name || ''}</strong><br><small>${DB.company.address || ''}</small></div></div>`;
+  } else {
+    html += `<div><h3>${DB.company ? DB.company.name : 'Attendance Pro'}</h3><small>${DB.company ? DB.company.address : ''}</small></div>`;
+  }
+
+  if(showProfile && DB.profile){
+    html += `<div style="display:flex; align-items:center; gap:8px; text-align:right;"><img src="${DB.profile.img}" style="width:45px; height:45px; border-radius:50%; object-fit:cover;"><div><b>${DB.profile.name}</b><br><small>${DB.profile.role}</small></div></div>`;
+  }
+  html += `</div>`;
+
+  let filteredEmps = DB.employees.filter(e => {
+    if(deptFilter !== 'all' && String(e.dept) !== deptFilter) return false;
+    const currentShift = getEmployeeShiftForDate(e, dateVal);
+    if(shiftFilter !== 'all' && String(currentShift) !== shiftFilter) return false;
+    return true;
+  });
+
+  if(view === 'daily'){
+    html += `<h4>Daily Attendance Report - ${dateVal}</h4>`;
+    html += `<table style="width:100%; margin-top:10px;"><thead><tr><th>ID</th><th>Worker Name</th><th>Department</th><th>Shift</th><th>Status</th></tr></thead><tbody>`;
+    filteredEmps.forEach(e => {
+      const deptName = DB.departments.find(d => d.id == e.dept)?.name || '-';
+      const shiftName = DB.shifts.find(s => s.id == getEmployeeShiftForDate(e, dateVal))?.name || '-';
+      const defSt = getDefaultStatus(e, dateVal);
+      const st = DB.attendance[dateVal]?.[e.id] || defSt;
+      html += `<tr><td>${e.id}</td><td>${e.name}</td><td>${deptName}</td><td>${shiftName}</td><td><strong>${st}</strong></td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    // Monthly View Matrix
+    let [year, month] = dateVal.split('-');
+    year = parseInt(year); month = parseInt(month);
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    html += `<h4>Monthly Attendance Matrix - ${year}-${month}</h4>`;
+    html += `<div style="overflow-x:auto; width:100%;"><table style="width:100%; font-size:11px;"><thead><tr><th>ID</th><th>Name</th>`;
+    for(let d=1; d<=daysInMonth; d++){
+      html += `<th>${d}</th>`;
+    }
+    html += `</tr></thead><tbody>`;
+
+    filteredEmps.forEach(e => {
+      html += `<tr><td>${e.id}</td><td>${e.name}</td>`;
+      for(let d=1; d<=daysInMonth; d++){
+        let dayStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        let defSt = getDefaultStatus(e, dayStr);
+        let st = DB.attendance[dayStr]?.[e.id] || defSt;
+        html += `<td>${st}</td>`;
+      }
+      html += `</tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const element = document.getElementById('exportPagesContainer');
+  html2canvas(element, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+    pdf.save('Attendance_Report.pdf');
+  });
+}
+
+function downloadPNG(){
+  const element = document.getElementById('exportPagesContainer');
+  html2canvas(element).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'Attendance_Report.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+/* DASHBOARD SUMMARY & 3D HD MASTER CHART LOGIC */
+function renderDashboardStats(){
+  const today = new Date().toISOString().split('T')[0];
+  ensureDefaultPresent(today);
+  const activeEmps = DB.employees.filter(e => isEmployeeActive(e, today));
+
+  let presentList = [], absentList = [], leaveList = [], clList = [], elList = [], dutyList = [];
+  activeEmps.forEach(e => {
+    const defSt = getDefaultStatus(e, today);
+    const st = DB.attendance[today]?.[e.id] || defSt;
+    if(st === 'P' || st === '2P') presentList.push(e.name);
+    else if(st === 'A') absentList.push(e.name);
+    else if(st === 'H') leaveList.push(e.name);
+    else if(st === 'CL') clList.push(e.name);
+    else if(st === 'EL') elList.push(e.name);
+    else if(st === 'GAZ' || st === 'WF') dutyList.push(e.name);
+  });
+
+  document.getElementById('numDept').innerText = DB.departments.length;
+  document.getElementById('numWorker').innerText = activeEmps.length;
+  document.getElementById('numPresent').innerText = presentList.length;
+  document.getElementById('numAbsent').innerText = absentList.length;
+  document.getElementById('numLeaves').innerText = leaveList.length;
+  document.getElementById('numCL').innerText = clList.length;
+  document.getElementById('numEL').innerText = elList.length;
+  document.getElementById('numDuty').innerText = dutyList.length;
+
+  document.getElementById('statDept').innerText = `Active Depts: ${DB.departments.map(d=>d.name).join(', ')||'None'}`;
+  document.getElementById('statWorker').innerText = `Workers: ${activeEmps.map(e=>e.name).join(', ')||'None'}`;
+  document.getElementById('statPresent').innerText = `Present: ${presentList.join(', ')||'None'}`;
+  document.getElementById('statAbsent').innerText = `Absent: ${absentList.join(', ')||'None'}`;
+  document.getElementById('statLeaves').innerText = `Half Leaves: ${leaveList.join(', ')||'None'}`;
+  document.getElementById('statCL').innerText = `CL: ${clList.join(', ')||'None'}`;
+  document.getElementById('statEL').innerText = `EL: ${elList.join(', ')||'None'}`;
+  document.getElementById('statDuty').innerText = `Duty/Gazetted: ${dutyList.join(', ')||'None'}`;
+
+  renderDashboard3DMasterChart([
+    DB.departments.length,
+    activeEmps.length,
+    presentList.length,
+    absentList.length,
+    leaveList.length,
+    clList.length,
+    elList.length,
+    dutyList.length
+  ]);
+}
+
+function changeMasterChartStyle(styleName) {
+  DB.settings.masterChartStyle = styleName;
+  saveDB();
+  renderDashboardStats();
+}
+
+function renderDashboard3DMasterChart(dataValues) {
+  const ctx = document.getElementById('dashboardMasterChart');
+  if(!ctx) return;
+
+  const style = DB.settings.masterChartStyle || 'bar3d';
+  const labels = ['Departments', 'Total Workers', 'Present', 'Absent', 'Half Leaves', 'CL', 'EL', 'Duty/Gazetted'];
+
+  const hdColors = [
+    '#f59e0b', '#3b82f6', '#10b981', '#ef4444', 
+    '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
+  ];
+
+  let chartType = 'bar';
+  let isIndexAxisY = false;
+
+  if (style === 'barHoriz3d') { chartType = 'bar'; isIndexAxisY = true; }
+  else if (style === 'doughnut3d') { chartType = 'doughnut'; }
+  else if (style === 'pie3d') { chartType = 'pie'; }
+  else if (style === 'line3d') { chartType = 'line'; }
+  else if (style === 'polar3d') { chartType = 'polarArea'; }
+
+  if (dashboardMasterChartInstance) {
+    dashboardMasterChartInstance.destroy();
+  }
+
+  dashboardMasterChartInstance = new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Attendance Analytics HD',
+        data: dataValues,
+        backgroundColor: hdColors,
+        borderColor: '#d4af37',
+        borderWidth: 2,
+        borderRadius: 8,
+        fill: style === 'line3d' ? true : false,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: isIndexAxisY ? 'y' : 'x',
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#fef08a', font: { size: 12, weight: 'bold' } }
+        }
+      },
+      scales: (chartType === 'pie' || chartType === 'doughnut' || chartType === 'polarArea') ? {} : {
+        x: { ticks: { color: '#fef08a' }, grid: { color: 'rgba(212, 175, 55, 0.15)' } },
+        y: { ticks: { color: '#fef08a' }, grid: { color: 'rgba(212, 175, 55, 0.15)' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function loadPageData(id){
+  if(id==='dashboard') renderDashboardStats();
+  if(id==='department') renderDepartments();
+  if(id==='shift') renderShifts();
+  if(id==='employee') renderEmployees();
+  if(id==='attendance'){ initAttendanceFilters(); renderAttendance(); }
+  if(id==='salary') initSalaryModule();
+  if(id==='export'){ initExportFilters(); renderExportTable(); }
+  if(id==='setting') loadCustomizationUI();
+}
+
+// Initial App Startup
+document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+document.getElementById('attDate').value = new Date().toISOString().split('T')[0];
+initSettingsUI();
+applyLanguageUI();
+loadCustomizationUI();
+updateProfileUI(); 
+renderDepartments(); 
+renderShifts(); 
+renderEmployees(); 
+renderDashboardStats();
+</script>
+
+<!-- AttendancePro integrated enhancements -->
+<script>
+(() => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* One theme control only: retain the top Switch Theme button */
+    #topThemeDropdown, label[for="topThemeDropdown"],
+    #settingAppTheme { display:none !important; }
+    #settingAppTheme { pointer-events:none !important; }
+    .stat-card {
+      background: linear-gradient(145deg, color-mix(in srgb, var(--card-bg) 92%, white 8%), var(--card-bg)) !important;
+      border-color: var(--card-border) !important;
+    }
+    .marquee-box { border-color: transparent !important; }
+    .marquee-text {
+      color: var(--text) !important;
+      text-shadow: 1px 1px 2px rgba(0,0,0,.65);
+    }
+    .list-zoom-tools { display:flex; align-items:center; gap:6px; margin:10px 0; justify-content:flex-end; }
+    .list-zoom-tools button { min-width:34px; padding:5px 9px; border-radius:8px; cursor:pointer; border:1px solid var(--card-border); background:var(--wood-texture-btn); color:var(--btn-text); font-weight:bold; }
+    .list-zoom-tools span { color:var(--text) !important; min-width:42px; text-align:center; font-size:12px; }
+    #salaryExportContainer { overflow:auto; }
+    #salaryExportContainer table { transform-origin:top left; }
+    #exportPagesContainer { transform-origin:top center; }
+    body, .page, .card, .card p, .card h1, .card h2, .card h3, .card h4, .card label,
+    .sidebar, .sidebar a, .sidebar button, .header, .header h1, .header span,
+    .stat-card, .stat-card p, .stat-card h3, .table-wrapper, .modal-content,
+    .form-group label { color:var(--text) !important; }
+    input, select, textarea { color:var(--input-text) !important; background-color:var(--input-bg) !important; }
+    .btn, button.btn { color:var(--btn-text) !important; }
+    .salary-chart-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0; }
+    .paper-preview { display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .a4-paper {
+      background:#fff !important; color:#111 !important; box-sizing:border-box;
+      flex:none; overflow:hidden; padding:8mm; position:relative;
+      box-shadow:0 2px 14px rgba(0,0,0,.22);
+      font-family:var(--export-font-family, "Times New Roman",serif) !important;
+      font-size:var(--export-font-size,12px) !important;
+    }
+    .a4-paper * { box-sizing:border-box; font-family:inherit !important; font-style:normal !important; }
+    .a4-paper.portrait { width:210mm; height:297mm; }
+    .a4-paper.landscape { width:297mm; height:210mm; }
+    .rotate-wrap { position:relative; width:210mm; height:297mm; overflow:hidden; flex:none; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.22); }
+    .rotate-wrap > .a4-paper { position:absolute; top:0; left:0; transform-origin:top left; transform:translateX(210mm) rotate(90deg); box-shadow:none; }
+    .paper-heading { text-align:center; color:#111; margin:0 0 4mm; }
+    .paper-brand-row { display:grid; grid-template-columns:1fr 1.4fr 1fr; align-items:center; gap:3mm; min-height:20mm; margin-bottom:3mm; border-bottom:1px solid #aaa; padding-bottom:2mm; }
+    .paper-brand-left,.paper-brand-right { display:flex; align-items:center; gap:2mm; min-width:0; }
+    .paper-brand-left { justify-content:flex-start; text-align:left; }
+    .paper-brand-right { justify-content:flex-end; text-align:right; }
+    .paper-brand-center { text-align:center; }
+    .paper-brand-row img { width:15mm; height:15mm; object-fit:cover; border-radius:50%; flex:none; }
+    .paper-brand-name { font-size:12px; font-weight:bold; }
+    .paper-brand-sub { font-size:9px; font-weight:normal; }
+    .paper-title { text-align:center; font-size:14px; font-weight:bold; margin:2mm 0 1mm; }
+    .paper-date { text-align:center; font-size:11px; margin-bottom:4mm; }
+    .a4-paper table { width:100%; border-collapse:collapse; margin:0; border-radius:0; box-shadow:none; background:#fff; table-layout:auto; }
+    .a4-paper th,.a4-paper td {
+      color:#111 !important; border:1px solid #555; padding:2.1mm 1.4mm;
+      text-align:center; white-space:nowrap; font-size:inherit; background:#fff;
+    }
+    .a4-paper th { background:#e8edf3 !important; color:#111 !important; font-weight:bold; }
+    .a4-paper.monthly { padding:6mm; }
+    .a4-paper.monthly table th,.a4-paper.monthly table td { padding:1.1mm .55mm; font-size:7.2px; }
+    .a4-paper.monthly .paper-title { font-size:12px; }
+    .a4-paper.monthly .paper-date { margin-bottom:2mm; }
+    .a4-paper.salary-report { width:297mm; height:210mm; padding:5mm 6mm; }
+    .a4-paper.salary-report .paper-brand-row { min-height:14mm; margin-bottom:1.5mm; padding-bottom:1mm; }
+    .a4-paper.salary-report .paper-brand-row img { width:11mm; height:11mm; }
+    .a4-paper.salary-report .paper-title { font-size:12px; margin:1mm 0 .5mm; }
+    .a4-paper.salary-report .paper-date { font-size:9px; margin-bottom:2mm; }
+    .a4-paper.salary-report table { table-layout:fixed; }
+    .a4-paper.salary-report th,.a4-paper.salary-report td { padding:1mm .7mm; font-size:8.5px; line-height:1.15; }
+    .a4-paper.salary-report th { white-space:normal; }
+    .paper-page-number { position:absolute; bottom:3mm; right:8mm; font-size:8px; color:#555; }
+    #exportContainerWrapper { overflow:auto !important; }
+    #exportPagesContainer { min-width:max-content; }
+    @media print {
+      body * { visibility:hidden !important; }
+      #exportPagesContainer,#exportPagesContainer * { visibility:visible !important; }
+      #exportPagesContainer { position:absolute; left:0; top:0; }
+      .a4-paper { box-shadow:none; margin:0; page-break-after:always; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function addListZoom(containerId, key) {
+    const container=document.getElementById(containerId);
+    if(!container || container.dataset.zoomReady) return;
+    container.dataset.zoomReady='1';
+    const tools=document.createElement('div'); tools.className='list-zoom-tools';
+    tools.innerHTML='<button type="button" aria-label="Zoom out">−</button><span>100%</span><button type="button" aria-label="Zoom in">+</button><button type="button" aria-label="Reset zoom">↺</button>';
+    const [minus,label,plus,reset]=tools.children; let scale=1;
+    const target=containerId==='salaryExportContainer' ? document.getElementById('salaryCalcTable') : document.getElementById('exportPagesContainer');
+    const apply=()=>{ target.style.zoom=String(scale); label.textContent=Math.round(scale*100)+'%'; };
+    minus.onclick=()=>{scale=Math.max(.5,+(scale-.1).toFixed(2));apply();};
+    plus.onclick=()=>{scale=Math.min(1.8,+(scale+.1).toFixed(2));apply();};
+    reset.onclick=()=>{scale=1;apply();};
+    container.parentNode.insertBefore(tools,container);
+  }
+  function addPageZoomControls(){ addListZoom('exportContainerWrapper','export'); addListZoom('salaryExportContainer','salary'); }
+
+  function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+  function dateLabel(iso) {
+    if (!iso) return '';
+    const [y,m,d] = iso.split('-');
+    return `${d}-${m}-${y}`;
+  }
+  function activeFilteredEmployees(date, deptFilter, shiftFilter) {
+    return DB.employees.filter(e => {
+      if (!isEmployeeActive(e, date)) return false;
+      if (deptFilter !== 'all' && String(e.dept) !== String(deptFilter)) return false;
+      const sh = getEmployeeShiftForDate(e, date);
+      if (shiftFilter !== 'all' && String(sh) !== String(shiftFilter)) return false;
+      return true;
+    }).sort((a,b) => {
+      const da = DB.departments.find(d => d.id == a.dept)?.name || '';
+      const db = DB.departments.find(d => d.id == b.dept)?.name || '';
+      return da.localeCompare(db) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+    });
+  }
+  function groupByDepartment(employees) {
+    const groups = [];
+    employees.forEach(e => {
+      const name = DB.departments.find(d => d.id == e.dept)?.name || 'Other';
+      let group = groups.find(g => g.name === name);
+      if (!group) groups.push(group = {name, employees:[]});
+      group.employees.push(e);
+    });
+    return groups;
+  }
+  function brandHeader(showProfile, showLogo, dateText, deptName) {
+    const logo = showLogo ? (DB.company?.logo ? `<img src="${DB.company.logo}" crossorigin="anonymous" alt="Company logo">` : '') : '';
+    const logoText = showLogo ? `<div class="paper-brand-name">${esc(DB.company?.name || 'Attendance Pro')}</div><div class="paper-brand-sub">${esc(DB.company?.address || '')}</div>` : '';
+    const profileImage = showProfile && DB.profile?.img ? `<img src="${DB.profile.img}" crossorigin="anonymous" alt="Profile image">` : '';
+    const profileText = showProfile ? `<div class="paper-brand-name">${esc(DB.profile?.name || 'Profile')}</div><div class="paper-brand-sub">${esc(DB.profile?.role || '')}</div>` : '';
+    return `<div class="paper-brand-row">
+      <div class="paper-brand-left">${logo}${logoText}</div>
+      <div class="paper-brand-center">${dateText || deptName ? `<div class="paper-brand-sub">${esc(dateText || '')}</div><div class="paper-brand-name">${deptName ? 'Department: '+esc(deptName) : 'All Departments'}</div>` : ''}</div>
+      <div class="paper-brand-right">${profileImage}${profileText}</div>
+    </div>`;
+  }
+  function pageShell(orientation, title, dateText, deptName, body, pageNo, extra='') {
+    const cls = orientation === 'landscape' ? 'landscape monthly' : 'portrait';
+    const showProfile = document.getElementById('showProfileInExport')?.checked;
+    const showLogo = document.getElementById('showLogoInExport')?.checked;
+    return `<section class="a4-paper ${cls}" style="--export-font-family:${DB.settings?.font || '"Times New Roman",serif'};--export-font-size:${DB.settings?.fontSize || '12px'}">
+      ${brandHeader(showProfile, showLogo, dateText, deptName)}
+      <div class="paper-title">${esc(title)}</div>
+      ${body}
+      ${extra}
+      <div class="paper-page-number">Page ${pageNo}</div>
+    </section>`;
+  }
+  function makeDailyPages(date, employees) {
+    const groups = groupByDepartment(employees), pages = [];
+    groups.forEach(group => {
+      for (let i=0; i<group.employees.length; i+=25) {
+        const chunk = group.employees.slice(i,i+25);
+        const rows = chunk.map(e => {
+          const dept = DB.departments.find(d => d.id == e.dept)?.name || '-';
+          const shift = DB.shifts.find(s => s.id == getEmployeeShiftForDate(e,date))?.name || '-';
+          const status = DB.attendance[date]?.[e.id] || getDefaultStatus(e,date);
+          return `<tr><td>${esc(e.id)}</td><td style="text-align:left">${esc(e.name)}</td><td>${esc(dept)}</td><td>${esc(shift)}</td><td><b>${esc(status)}</b></td></tr>`;
+        }).join('');
+        const table = `<table><thead><tr><th>Worker ID</th><th>Worker Name</th><th>Department</th><th>Work Shift</th><th>Attendance</th></tr></thead><tbody>${rows}</tbody></table>`;
+        pages.push(pageShell('portrait','DAILY ATTENDANCE REPORT',`Attendance Date: ${dateLabel(date)}`,group.name,table,pages.length+1));
+      }
+    });
+    return pages;
+  }
+  function makeMonthlyPages(date, employees) {
+    const [year, month] = date.split('-').map(Number);
+    const days = new Date(year,month,0).getDate();
+    const groups = groupByDepartment(employees), pages = [];
+    groups.forEach(group => {
+      for (let i=0; i<group.employees.length; i+=18) {
+        const chunk = group.employees.slice(i,i+18);
+        const heads = Array.from({length:days},(_,i)=>`<th>${i+1}</th>`).join('');
+        const rows = chunk.map(e => {
+          const cells = Array.from({length:days},(_,i) => {
+            const day = `${year}-${String(month).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`;
+            const todayLocal = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+            if (day > todayLocal) return '<td></td>';
+            return `<td>${esc(DB.attendance[day]?.[e.id] || getDefaultStatus(e,day))}</td>`;
+          }).join('');
+          return `<tr><td>${esc(e.id)}</td><td style="text-align:left">${esc(e.name)}</td>${cells}</tr>`;
+        }).join('');
+        const table = `<table><thead><tr><th>ID</th><th>Name</th>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+        pages.push(pageShell('landscape','MONTHLY ATTENDANCE MATRIX',`Month: ${String(month).padStart(2,'0')}-${year}`,group.name,table,pages.length+1));
+      }
+    });
+    return pages;
+  }
+
+  window.renderExportTable = function() {
+    const view = document.getElementById('expView').value;
+    const date = document.getElementById('expDate').value || new Date().toISOString().slice(0,10);
+    const employees = activeFilteredEmployees(date,
+      document.getElementById('expDeptFilter').value,
+      document.getElementById('expShiftFilter').value);
+    const rotateBox = document.getElementById('rotateOptionContainer');
+    if (rotateBox) rotateBox.style.display = (view === 'monthly') ? 'block' : 'none';
+    const rotated = view === 'monthly' && document.getElementById('rotateMonthlyExport')?.checked;
+    let pages = view === 'monthly' ? makeMonthlyPages(date,employees) : makeDailyPages(date,employees);
+    if (rotated) pages = pages.map(p => `<div class="rotate-wrap">${p}</div>`);
+    const target = document.getElementById('exportPagesContainer');
+    target.className = 'paper-preview';
+    target.innerHTML = pages.length ? pages.join('') : '<p style="padding:20px;color:#111">No employee records found for this selection.</p>';
+  };
+
+  async function ensureJsPDF() {
+    if (window.jspdf?.jsPDF) return;
+    await new Promise((resolve,reject) => {
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+    });
+  }
+  async function renderPageCanvases() {
+    if (!window.html2canvas) throw new Error('The PDF/image export library did not load.');
+    const rotated = document.getElementById('expView').value === 'monthly' && document.getElementById('rotateMonthlyExport')?.checked;
+    const pages = [...document.querySelectorAll('#exportPagesContainer .a4-paper')];
+    const canvases = [];
+    for (const page of pages) {
+      let canvas = await html2canvas(page,{
+        scale:3, backgroundColor:'#ffffff', useCORS:true, logging:false,
+        onclone: doc => {
+          doc.querySelectorAll('#exportPagesContainer .a4-paper').forEach(s => {
+            s.style.transform = 'none'; s.style.position = 'relative';
+            const w = s.parentElement;
+            if (w && w.classList.contains('rotate-wrap')) {
+              w.style.width = 'auto'; w.style.height = 'auto'; w.style.overflow = 'visible'; w.style.boxShadow = 'none';
+            }
+          });
+        }
+      });
+      if (rotated) {
+        // full landscape page -> rotated 90deg onto a portrait A4 canvas (nothing is cut)
+        const r = document.createElement('canvas');
+        r.width = canvas.height; r.height = canvas.width;
+        const c = r.getContext('2d');
+        c.fillStyle = '#fff'; c.fillRect(0,0,r.width,r.height);
+        c.translate(r.width,0); c.rotate(Math.PI/2); c.drawImage(canvas,0,0);
+        canvas = r;
+      }
+      canvases.push(canvas);
+    }
+    return canvases;
+  }
+  window.downloadPDF = async function() {
+    try {
+      await ensureJsPDF();
+      const canvases = await renderPageCanvases();
+      if (!canvases.length) return alert('No pages to export.');
+      const landscape = document.getElementById('expView').value === 'monthly' && !document.getElementById('rotateMonthlyExport')?.checked;
+      const pdf = new window.jspdf.jsPDF(landscape?'l':'p','mm','a4');
+      canvases.forEach((canvas,index) => {
+        if(index) pdf.addPage('a4',landscape?'landscape':'portrait');
+        const w=landscape?297:210, h=landscape?210:297;
+        pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h,undefined,'FAST');
+      });
+      pdf.save('Attendance_Report.pdf');
+    } catch(err) { console.error(err); alert('PDF export failed: '+err.message); }
+  };
+  window.downloadPNG = async function() {
+    try {
+      const canvases = await renderPageCanvases();
+      if (!canvases.length) return alert('No pages to export.');
+      canvases.forEach((canvas,index) => {
+        const link=document.createElement('a');
+        link.download=`Attendance_Report_Page_${String(index+1).padStart(2,'0')}.png`;
+        link.href=canvas.toDataURL('image/png');
+        link.click();
+      });
+    } catch(err) { console.error(err); alert('PNG export failed: '+err.message); }
+  };
+
+  function addSalaryChartStyle() {
+    const chartCard = document.getElementById('salaryMasterChart')?.closest('.card');
+    if (!chartCard || document.getElementById('salaryChartStyle')) return;
+    const tools=document.createElement('div');
+    tools.className='salary-chart-tools';
+    tools.innerHTML='<label for="salaryChartStyle">Chart Style:</label><select id="salaryChartStyle" style="width:auto;margin:0"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option><option value="pie">Pie</option><option value="polarArea">Polar Area</option><option value="radar">Radar</option></select>';
+    chartCard.insertBefore(tools,chartCard.querySelector('div[style*="height: 320px"]'));
+    const select=tools.querySelector('select');
+    select.value=DB.settings?.salaryChartStyle || 'bar';
+    select.onchange=()=>{ DB.settings.salaryChartStyle=select.value; saveDB(); renderSalaryMasterChart(); };
+  }
+  const originalSalaryChart = window.renderSalaryMasterChart;
+  window.renderSalaryMasterChart = function() {
+    const ctx=document.getElementById('salaryMasterChart');
+    if(!ctx || !window.Chart) return;
+    const totals={};
+    DB.departments.forEach(d=>totals[d.name]=0);
+    DB.employees.forEach(e=>{
+      const name=DB.departments.find(d=>d.id==e.dept)?.name||'Other';
+      totals[name]=(totals[name]||0)+(e.netSalary||0);
+    });
+    if(salaryChartInstance) salaryChartInstance.destroy();
+    const type=DB.settings?.salaryChartStyle || 'bar';
+    salaryChartInstance=new Chart(ctx,{
+      type,
+      data:{labels:Object.keys(totals),datasets:[{
+        label:'Net Payable Salary (Rs.)',data:Object.values(totals),
+        backgroundColor:['#f59e0b','#3b82f6','#10b981','#8b5cf6','#ef4444','#06b6d4'],
+        borderColor:'#d4af37',borderWidth:2,fill:type==='line',tension:.35
+      }]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type!=='bar'&&type!=='line'}} ,
+        scales:['pie','doughnut','polarArea','radar'].includes(type)?{}:{y:{beginAtZero:true}}}
+    });
+  };
+
+  function salaryPages() {
+    const filter=document.getElementById('salaryDeptFilter').value;
+    const salaryMonthValue=document.getElementById('salaryMonth')?.value || currentMonth();
+    const emps=(filter==='all'?DB.employees:DB.employees.filter(e=>String(e.dept)===String(filter)))
+      .slice().sort((a,b)=>{
+        const da=DB.departments.find(d=>d.id==a.dept)?.name||'';
+        const db=DB.departments.find(d=>d.id==b.dept)?.name||'';
+        return da.localeCompare(db)||String(a.id).localeCompare(String(b.id),undefined,{numeric:true});
+      });
+    const pages=[];
+    groupByDepartment(emps).forEach(group=>{
+      for(let i=0;i<group.employees.length;i+=25){
+        const chunk=group.employees.slice(i,i+25);
+        let sums=[0,0,0,0,0,0,0];
+        const rows=chunk.map(e=>{
+          const v=salaryMonthData(e,salaryMonthValue);
+          const vals=[e.salary||0,v.presentDays,v.absentDays,v.absentDeduction,v.esi,v.pf,v.net];
+          vals.forEach((x,j)=>sums[j]+=Number(x)||0);
+          return `<tr><td>${esc(e.id)}</td><td style="text-align:left">${esc(e.name)}</td><td>${esc(group.name)}</td>${vals.map((x,j)=>`<td>${j===1||j===2?Number(x).toFixed(1):Number(x).toFixed(2)}</td>`).join('')}</tr>`;
+        }).join('');
+        const total=`<tr><th colspan="3" style="text-align:right">PAGE TOTAL</th>${sums.map(v=>`<th>${v.toFixed(2)}</th>`).join('')}</tr>`;
+        const table=`<table><thead><tr><th>Worker ID</th><th>Worker Name</th><th>Department</th><th>Monthly Salary</th><th>Present Days</th><th>Absent Days</th><th>Absent Deduction</th><th>ESI</th><th>PF</th><th>Net Payable</th></tr></thead><tbody>${rows}</tbody><tfoot>${total}</tfoot></table>`;
+        pages.push(`<section class="a4-paper landscape salary-report">${brandHeader(false,false)}<div class="paper-title">SALARY REPORT · ${esc(salaryMonthValue)}</div><div class="paper-date">Department: ${esc(group.name)} · Generated: ${dateLabel(new Date().toISOString().slice(0,10))}</div>${table}<div class="paper-page-number">Page ${pages.length+1}</div></section>`);
+      }
+    });
+    return pages;
+  }
+  async function exportSalaryPDFPaged() {
+    await ensureJsPDF();
+    const holder=document.createElement('div');
+    holder.className='paper-preview';
+    holder.style.position='fixed'; holder.style.left='-10000px'; holder.innerHTML=salaryPages().join('');
+    document.body.appendChild(holder);
+    try {
+      const canvases=[];
+      for(const page of holder.querySelectorAll('.a4-paper')) canvases.push(await html2canvas(page,{scale:3,backgroundColor:'#fff',useCORS:true}));
+      if(!canvases.length) return alert('No salary records found.');
+      const pdf=new window.jspdf.jsPDF('l','mm','a4');
+      canvases.forEach((c,i)=>{if(i)pdf.addPage('a4','landscape');pdf.addImage(c.toDataURL('image/png'),'PNG',0,0,297,210,undefined,'FAST');});
+      pdf.save('Worker_Salary_Report.pdf');
+    } finally { holder.remove(); }
+  }
+  window.exportSalaryPDF=exportSalaryPDFPaged;
+  window.exportSalaryPNG=async function(){
+    const holder=document.createElement('div');
+    holder.className='paper-preview'; holder.style.position='fixed'; holder.style.left='-10000px';
+    holder.innerHTML=salaryPages().join(''); document.body.appendChild(holder);
+    try {
+      let i=0;
+      for(const page of holder.querySelectorAll('.a4-paper')){
+        const c=await html2canvas(page,{scale:3,backgroundColor:'#fff',useCORS:true});
+        const a=document.createElement('a'); a.download=`Worker_Salary_Report_Page_${String(++i).padStart(2,'0')}.png`;
+        a.href=c.toDataURL('image/png'); a.click();
+      }
+      if(!i) alert('No salary records found.');
+    } finally { holder.remove(); }
+  };
+
+  const oldLoadPageData=window.loadPageData;
+  window.loadPageData=function(id) {
+    oldLoadPageData(id);
+    if(id==='salary') addSalaryChartStyle();
+  };
+  document.addEventListener('DOMContentLoaded',addPageZoomControls);
+  addPageZoomControls();
+  addSalaryChartStyle();
+
+  const localToday = () => new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const currentMonth = () => localToday().slice(0,7);
+  const monthInput = document.getElementById('salaryMonth');
+  if (monthInput && !monthInput.value) monthInput.value = currentMonth();
+  if (!DB.salaryRecords) DB.salaryRecords = {};
+  function salaryMonthData(emp, month) {
+    const [yy,mm] = month.split('-').map(Number);
+    const daysInMonth = new Date(yy,mm,0).getDate();
+    const today = localToday();
+    const lastDate = month < currentMonth() ? daysInMonth : month > currentMonth() ? 0 : Number(today.slice(8,10));
+    const monthStart=`${month}-01`, monthEnd=`${month}-${String(daysInMonth).padStart(2,'0')}`;
+    if ((emp.join && emp.join > monthEnd) || (emp.exit && emp.exit < monthStart)) {
+      return {presentDays:0,absentDays:0,absentDeduction:0,esi:0,pf:0,net:0,manual:false,payableDays:0};
+    }
+    const first = emp.join && emp.join.startsWith(month) ? Number(emp.join.slice(8,10)) : 1;
+    const exitDay = emp.exit && emp.exit.startsWith(month) ? Number(emp.exit.slice(8,10)) : daysInMonth;
+    const from = Math.min(daysInMonth,first), to = Math.min(daysInMonth,lastDate,exitDay);
+    let present=0, absent=0;
+    for(let d=from; d<=to; d++) {
+      const date=`${month}-${String(d).padStart(2,'0')}`;
+      const status=DB.attendance?.[date]?.[emp.id] || getDefaultStatus(emp,date);
+      if(status==='A') absent += 1;
+      else if(status==='H') { present += .5; absent += .5; }
+      else if(status==='WF') { /* weekly off */ }
+      else present += 1;
+    }
+    const saved=DB.salaryRecords?.[month]?.[emp.id] || {};
+    const manual=!!saved.manual;
+    const presentDays=manual ? Math.max(0,Math.min(daysInMonth,Number(saved.presentDays)||0)) : present;
+    const payableDays=Math.max(0,to-from+1);
+    const absentDays=manual ? Math.max(0,payableDays-presentDays) : absent;
+    const dailyRate=(Number(emp.salary)||0)/daysInMonth;
+    const absentDeduction=dailyRate*absentDays;
+    const afterAbsent=Math.max(0,(Number(emp.salary)||0)-absentDeduction);
+    const esi=afterAbsent>0 && afterAbsent<=25000 ? afterAbsent*.0075 : 0;
+    const pf=afterAbsent*.12;
+    return {presentDays,absentDays,absentDeduction,esi,pf,net:Math.max(0,afterAbsent-esi-pf),manual,payableDays};
+  }
+  /* Expose so Excel export (defined outside this scope) uses real attendance data */
+  window.salaryMonthData = salaryMonthData;
+  window.setSalaryManualMode = function(empId, checked) {
+    const month=document.getElementById('salaryMonth').value || currentMonth();
+    DB.salaryRecords[month] ||= {}; DB.salaryRecords[month][empId] ||= {};
+    DB.salaryRecords[month][empId].manual=!!checked;
+    saveDB(); renderSalaryPage();
+  };
+  window.updateSalaryPresentDays = function(empId, value) {
+    const month=document.getElementById('salaryMonth').value || currentMonth();
+    DB.salaryRecords[month] ||= {}; DB.salaryRecords[month][empId] ||= {};
+    DB.salaryRecords[month][empId].presentDays=Math.max(0,Number(value)||0);
+    DB.salaryRecords[month][empId].manual=true;
+    saveDB(); renderSalaryPage();
+  };
+  window.renderSalaryPage = function() {
+    const month=document.getElementById('salaryMonth')?.value || currentMonth();
+    const filter=document.getElementById('salaryDeptFilter').value;
+    const emps=(filter==='all'?DB.employees:DB.employees.filter(e=>String(e.dept)===String(filter)));
+    let sums={basic:0,present:0,absent:0,deduct:0,esi:0,pf:0,net:0};
+    document.getElementById('salaryTableBody').innerHTML=emps.map(e=>{
+      const d=DB.departments.find(x=>x.id==e.dept)?.name||'-';
+      const v=salaryMonthData(e,month);
+      sums.basic+=Number(e.salary)||0; sums.present+=v.presentDays; sums.absent+=v.absentDays;
+      sums.deduct+=v.absentDeduction; sums.esi+=v.esi; sums.pf+=v.pf; sums.net+=v.net;
+      return `<tr><td><b>${esc(e.id)}</b></td><td>${esc(e.name)}</td><td>${esc(d)}</td><td>₹ ${(Number(e.salary)||0).toFixed(2)}</td>
+        <td><label style="display:flex;gap:4px;align-items:center;white-space:nowrap"><input type="checkbox" ${v.manual?'checked':''} onchange="setSalaryManualMode('${String(e.id).replace(/'/g,"\\'")}',this.checked)"> Test</label>
+        <input type="number" min="0" max="${new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate()}" step="0.5" value="${v.presentDays}" ${v.manual?'':'disabled'} style="width:75px;margin:3px 0" onchange="updateSalaryPresentDays('${String(e.id).replace(/'/g,"\\'")}',this.value)"></td>
+        <td>${v.absentDays.toFixed(1)}</td><td>₹ ${v.absentDeduction.toFixed(2)}</td><td>₹ ${v.esi.toFixed(2)}</td><td>₹ ${v.pf.toFixed(2)}</td><td><b>₹ ${v.net.toFixed(2)}</b></td></tr>`;
+    }).join('');
+    document.getElementById('salaryTableFoot').innerHTML=`<tr style="font-weight:bold;background:#e2e8f0"><td colspan="3" style="text-align:right">TOTAL</td><td>₹ ${sums.basic.toFixed(2)}</td><td>${sums.present.toFixed(1)}</td><td>${sums.absent.toFixed(1)}</td><td>₹ ${sums.deduct.toFixed(2)}</td><td>₹ ${sums.esi.toFixed(2)}</td><td>₹ ${sums.pf.toFixed(2)}</td><td>₹ ${sums.net.toFixed(2)}</td></tr>`;
+    DB.employees.forEach(e=>{const v=salaryMonthData(e,month);e.esi=v.esi;e.pf=v.pf;e.netSalary=v.net;});
+    if(typeof renderSalaryMasterChart==='function') renderSalaryMasterChart();
+  };
+  window.calculateSalary = function() {
+    const month=document.getElementById('salaryMonth')?.value || currentMonth();
+    DB.salaryRecords ||= {}; DB.salaryRecords[month] ||= {};
+    DB.employees.forEach(e=>{const v=salaryMonthData(e,month);e.esi=v.esi;e.pf=v.pf;e.netSalary=v.net;});
+    saveDB(); renderSalaryPage();
+    alert(`Salary calculated for ${month}. Attendance records up to today are used; future dates are excluded.`);
+  };
+
+  const themeButton=document.getElementById('themeToggleBtn');
+  if(themeButton) themeButton.style.display='inline-block';
+  const topTheme=document.getElementById('topThemeDropdown');
+  if(topTheme && topTheme.parentElement) topTheme.parentElement.style.display='none';
+  const settingTheme=document.getElementById('settingAppTheme');
+  if(settingTheme && settingTheme.parentElement) settingTheme.parentElement.style.display='none';
+})();
+</script>
+</body>
+</html>
